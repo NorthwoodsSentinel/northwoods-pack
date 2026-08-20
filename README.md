@@ -10,13 +10,13 @@ A small Cloudflare Worker that drops into stock **PAI 5.0** and adds five capabi
 
 ## Ten minutes to an AI that knows you
 
-1. **Click Deploy** (button above). It creates the Worker + D1 database on **your** Cloudflare account.
-   The pack ships locked with a factory token and **refuses to run** until you replace it (otherwise every install would share one public key). Open your new Worker → Settings → Variables and Secrets → set `DEMO_TOKEN` to any long random string. The worker's own error message walks you through this too.
-   Fresh database? No migrations to run — the pack builds its own tables on first touch.
-2. **Open `https://<your-worker>.workers.dev/intake`** and answer five questions in your own words — who you are, what you're chasing, how an AI should speak to you, what it must never do, and anything it should already remember.
-3. **Paste your MCP URL** (shown when the interview saves) into Claude — Settings → Connectors — or any MCP client.
+1. **Click Deploy** (button above). Cloudflare creates the Worker and a database on **your** account, and shows every setting before it builds — **when you see the `DEMO_TOKEN` field, replace the CHANGE-ME text with your own long random string** (a password-manager generate is perfect; save it — it's your key). If you deploy without changing it, the pack refuses to run and tells you where to fix it: it ships locked so no two installs ever share a key.
+2. **Open your worker's URL.** That's the whole second step. The front door knows where you are: it walks you through the token if needed, then offers **Talk to it** — a chat that runs on your own account's built-in AI. If the pot is empty, the first conversation *is* the introduction: it interviews you, one question at a time, drafts answers in your words for you to approve, and invites you to show it things — a bookshelf photo, a page you wrote yourself — instead of demanding self-description. Nothing to fill out, nothing else to install, no other AI required.
+3. **Later, if you want it inside Claude or another AI:** open `/connect` on your worker. The harness hands you copy-ready commands with your URL already baked in. That's the upgrade path, not the entry fee.
 
-That's it. Your AI now reads *your* identity first, recalls *your* memories, and stores new ones — all in a database you own, on an account you control, changeable or deletable by you alone. No vendor holds your self.
+Your AI — built-in or connected — reads *your* identity first, recalls *your* memories with provenance, and stores new ones, all in a database you own, deletable by you alone. No vendor holds your self.
+
+**Honest notes:** your deploy-button repo copy is a snapshot — it does not auto-track this repo; to pick up new versions, redeploy from the button (your database survives if you select your existing D1/KV during setup, since your data lives in the database, not the worker). After testing, harden: move `DEMO_TOKEN` from a variable to a Secret in the same settings pane, and rotate it any time the URL may have leaked — rotation kills the old URL instantly.
 
 ## What it does
 

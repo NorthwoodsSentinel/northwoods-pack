@@ -39,6 +39,7 @@ import { handleIntakeForm, handleIntakeSubmit } from "./intake";
 import { handleMcp } from "./mcp";
 import { ensureSchema, tokenIsDefault, TOKEN_HELP } from "./setup";
 import { handleChatPage, handleChatSend } from "./chat";
+import { handleConnectPage } from "./connect";
 
 function landing(h1: string, lede: string, body: string): string {
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>northwoods-pack</title>
@@ -115,11 +116,15 @@ export default {
       return new Response(landing(
         "Your harness is alive",
         "It runs on your account, keeps everything in your database, and talks with its own built-in AI. If it doesn't know you yet, the first conversation is the introduction — it asks, you answer, nothing to fill out.",
-        '<p><a href="/chat"><button>Talk to it</button></a></p><p class="alt">Prefer forms? The <a href="/intake">five-question intake</a> still exists. Want it inside Claude or another MCP client instead? Your connector URL is <code>' + "this page's address + /mcp/ + your token" + '</code>.</p>'),
+        '<p><a href="/chat"><button>Talk to it</button></a></p><p class="alt">Prefer forms? The <a href="/intake">five-question intake</a> still exists. Want it inside Claude or another MCP client too? <a href="/connect">The harness will walk you through it</a>.</p>'),
         { headers: { "Content-Type": "text/html; charset=utf-8" } });
     }
     if (method === "GET" && path === "/api") {
       return info(env);
+    }
+    if (method === "GET" && path === "/connect") {
+      if (tokenIsDefault(env)) return json({ error: TOKEN_HELP }, 503);
+      return handleConnectPage();
     }
     if (method === "GET" && path === "/chat") {
       if (tokenIsDefault(env)) return json({ error: TOKEN_HELP }, 503);
