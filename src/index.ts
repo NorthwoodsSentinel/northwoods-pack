@@ -38,6 +38,15 @@ import { handleIdentityGet, handleIdentityPut } from "./identity";
 import { handleIntakeForm, handleIntakeSubmit } from "./intake";
 import { handleMcp } from "./mcp";
 import { ensureSchema, tokenIsDefault, TOKEN_HELP } from "./setup";
+import { handleChatPage, handleChatSend } from "./chat";
+
+function landing(h1: string, lede: string, body: string): string {
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>northwoods-pack</title>
+<style>body{font-family:system-ui,sans-serif;max-width:620px;margin:14dvh auto 0;padding:0 1rem;line-height:1.55;color:#1F2937}
+button{padding:.7rem 1.5rem;border:0;border-radius:8px;background:#1F2937;color:#fff;font:inherit;cursor:pointer}
+.alt{color:#6b7280;font-size:.92rem}code{background:#f3f4f6;padding:.1rem .3rem;border-radius:4px}</style></head>
+<body><h1>${h1}</h1><p>${lede}</p>${body}</body></html>`;
+}
 
 async function info(env: Env): Promise<Response> {
   const needsToken = tokenIsDefault(env);
@@ -50,7 +59,7 @@ async function info(env: Env): Promise<Response> {
   return json({
     pack: "northwoods-pack",
     setup: needsToken ? { needed: true, how: TOKEN_HELP } : { needed: false },
-    version: "0.4.1",
+    version: "0.5.0",
     purpose:
       "Public PAI v0.3 — 1 Worker, 1-click install: identity + intake interview + MCP, so your AI knows you in ten minutes.",
     modules: {
@@ -94,9 +103,33 @@ export default {
     const path = url.pathname;
     const method = request.method;
 
-    // Public info endpoint (no auth)
+    // The human front door: routes by state. Machines get JSON at /api.
     if (method === "GET" && (path === "/" || path === "")) {
+      if (tokenIsDefault(env)) {
+        return new Response(landing(
+          "One step left before this is yours",
+          "The pack ships locked with a factory token — otherwise every install would share one public key. In your Cloudflare dashboard open this Worker → <b>Settings → Variables and Secrets</b>, replace <code>DEMO_TOKEN</code> with a long random string of your own, and reload this page.",
+          ""), { headers: { "Content-Type": "text/html; charset=utf-8" } });
+      }
+      await ensureSchema(env);
+      return new Response(landing(
+        "Your harness is alive",
+        "It runs on your account, keeps everything in your database, and talks with its own built-in AI. If it doesn't know you yet, the first conversation is the introduction — it asks, you answer, nothing to fill out.",
+        '<p><a href="/chat"><button>Talk to it</button></a></p><p class="alt">Prefer forms? The <a href="/intake">five-question intake</a> still exists. Want it inside Claude or another MCP client instead? Your connector URL is <code>' + "this page's address + /mcp/ + your token" + '</code>.</p>'),
+        { headers: { "Content-Type": "text/html; charset=utf-8" } });
+    }
+    if (method === "GET" && path === "/api") {
       return info(env);
+    }
+    if (method === "GET" && path === "/chat") {
+      if (tokenIsDefault(env)) return json({ error: TOKEN_HELP }, 503);
+      await ensureSchema(env);
+      return handleChatPage();
+    }
+    if (method === "POST" && path === "/chat/send") {
+      if (tokenIsDefault(env)) return json({ error: TOKEN_HELP }, 503);
+      await ensureSchema(env);
+      return await handleChatSend(request, env);
     }
     // Intake interview: the form is public to render; the submit checks the
     // token in its body. MCP checks the token in its path. Both self-auth so

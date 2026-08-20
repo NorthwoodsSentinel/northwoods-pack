@@ -134,7 +134,7 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
     return rpcResult(id, {
       protocolVersion: PROTOCOL,
       capabilities: { tools: {} },
-      serverInfo: { name: "northwoods-pack", version: "0.4.1" },
+      serverInfo: { name: "northwoods-pack", version: "0.5.0" },
     });
   if (method === "notifications/initialized") return new Response(null, { status: 202 });
   if (method === "ping") return rpcResult(id, {});
