@@ -35,6 +35,15 @@ export function handleIntakeForm(): Response {
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Your harness wants to meet you</title>
 <style>
+  :root { --pine:#1B3B2F; --paper:#F5F3EF; --birch:#F5E6C8; --moss:#4A773C; --amber:#C9A84C; --sage:#A9B0A6; --night:#1d2016; --bark:#5C4B3C; }
+  body { background: var(--paper); color: var(--pine); font-family: Georgia, 'Times New Roman', serif; }
+  h1, h2 { font-family: system-ui, sans-serif; letter-spacing: -0.01em; color: var(--pine); }
+  button { background: var(--moss) !important; color: var(--birch) !important; border-radius: 8px; border: 0; cursor: pointer; font-family: system-ui, sans-serif; }
+  button:hover { background: var(--pine) !important; }
+  a { color: var(--moss); }
+  input, textarea { background: #fff; border: 1px solid var(--sage) !important; color: var(--pine); }
+  code, pre { background: #ece8df; color: var(--night); border-radius: 4px; }
+
   body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #1F2937; }
   label { font-weight: 600; display: block; margin-top: 1.5rem; }
   .hint { margin: 0.15rem 0 0.4rem; color: #6b7280; font-size: 0.9rem; }

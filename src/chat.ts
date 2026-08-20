@@ -101,6 +101,15 @@ export function handleChatPage(): Response {
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Your harness</title>
 <style>
+  :root { --pine:#1B3B2F; --paper:#F5F3EF; --birch:#F5E6C8; --moss:#4A773C; --amber:#C9A84C; --sage:#A9B0A6; --night:#1d2016; --bark:#5C4B3C; }
+  body { background: var(--paper); color: var(--pine); font-family: Georgia, 'Times New Roman', serif; }
+  h1, h2 { font-family: system-ui, sans-serif; letter-spacing: -0.01em; color: var(--pine); }
+  button { background: var(--moss) !important; color: var(--birch) !important; border-radius: 8px; border: 0; cursor: pointer; font-family: system-ui, sans-serif; }
+  button:hover { background: var(--pine) !important; }
+  a { color: var(--moss); }
+  input, textarea { background: #fff; border: 1px solid var(--sage) !important; color: var(--pine); }
+  code, pre { background: #ece8df; color: var(--night); border-radius: 4px; }
+
   body { font-family: system-ui, sans-serif; max-width: 680px; margin: 0 auto; padding: 1rem; color: #1F2937; display: flex; flex-direction: column; height: 100dvh; box-sizing: border-box; }
   #log { flex: 1; overflow-y: auto; padding: 0.5rem 0; }
   .msg { margin: 0.6rem 0; line-height: 1.5; white-space: pre-wrap; }

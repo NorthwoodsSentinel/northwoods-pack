@@ -11,6 +11,15 @@ export function handleConnectPage(): Response {
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Connect your harness</title>
 <style>
+  :root { --pine:#1B3B2F; --paper:#F5F3EF; --birch:#F5E6C8; --moss:#4A773C; --amber:#C9A84C; --sage:#A9B0A6; --night:#1d2016; --bark:#5C4B3C; }
+  body { background: var(--paper); color: var(--pine); font-family: Georgia, 'Times New Roman', serif; }
+  h1, h2 { font-family: system-ui, sans-serif; letter-spacing: -0.01em; color: var(--pine); }
+  button { background: var(--moss) !important; color: var(--birch) !important; border-radius: 8px; border: 0; cursor: pointer; font-family: system-ui, sans-serif; }
+  button:hover { background: var(--pine) !important; }
+  a { color: var(--moss); }
+  input, textarea { background: #fff; border: 1px solid var(--sage) !important; color: var(--pine); }
+  code, pre { background: #ece8df; color: var(--night); border-radius: 4px; }
+
   body { font-family: system-ui, sans-serif; max-width: 680px; margin: 2rem auto; padding: 0 1rem; line-height: 1.55; color: #1F2937; }
   input { width: 100%; padding: .6rem; border: 1px solid #d1d5db; border-radius: 8px; font: inherit; box-sizing: border-box; }
   .dest { margin-top: 1.6rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 10px; }

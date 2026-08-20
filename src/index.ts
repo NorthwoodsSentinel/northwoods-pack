@@ -43,9 +43,18 @@ import { handleConnectPage } from "./connect";
 
 function landing(h1: string, lede: string, body: string): string {
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>northwoods-pack</title>
-<style>body{font-family:system-ui,sans-serif;max-width:620px;margin:14dvh auto 0;padding:0 1rem;line-height:1.55;color:#1F2937}
-button{padding:.7rem 1.5rem;border:0;border-radius:8px;background:#1F2937;color:#fff;font:inherit;cursor:pointer}
-.alt{color:#6b7280;font-size:.92rem}code{background:#f3f4f6;padding:.1rem .3rem;border-radius:4px}</style></head>
+<style>
+  :root { --pine:#1B3B2F; --paper:#F5F3EF; --birch:#F5E6C8; --moss:#4A773C; --amber:#C9A84C; --sage:#A9B0A6; }
+  body{font-family:Georgia,serif;max-width:640px;margin:10dvh auto 0;padding:0 1rem 3rem;line-height:1.6;color:var(--pine);background:var(--paper)}
+  h1{font-family:system-ui,sans-serif;letter-spacing:-.01em} h1::before{content:"🌲 "}
+  button{padding:.7rem 1.5rem;border:0;border-radius:8px;background:var(--moss);color:var(--birch);font:1rem system-ui,sans-serif;cursor:pointer}
+  button:hover{background:var(--pine)}
+  .alt{color:var(--sage);font-size:.92rem}code{background:#ece8df;padding:.1rem .3rem;border-radius:4px}
+  .doors{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem}
+  .door{flex:1;min-width:240px;border:1px solid var(--sage);border-radius:10px;padding:1rem}
+  .door h2{font-family:system-ui,sans-serif;font-size:1.02rem;margin:0 0 .4rem}
+  .promise{border-left:3px solid var(--amber);padding:.2rem 0 .2rem .9rem;margin-top:1.4rem;font-style:italic}
+</style></head>
 <body><h1>${h1}</h1><p>${lede}</p>${body}</body></html>`;
 }
 
@@ -115,8 +124,17 @@ export default {
       await ensureSchema(env);
       return new Response(landing(
         "Your harness is alive",
-        "It runs on your account, keeps everything in your database, and talks with its own built-in AI. If it doesn't know you yet, the first conversation is the introduction — it asks, you answer, nothing to fill out.",
-        '<p><a href="/chat"><button>Talk to it</button></a></p><p class="alt">Prefer forms? The <a href="/intake">five-question intake</a> still exists. Want it inside Claude or another MCP client too? <a href="/connect">The harness will walk you through it</a>.</p>'),
+        "It runs on your account, keeps everything in your database, and talks with its own built-in AI. Nothing here belongs to anyone but you.",
+        `<div class="doors">
+           <div class="door"><h2>I'm new — no AI setup, no terminal</h2>
+             <p>Then just talk. The first conversation is the introduction: it asks, you answer, nothing to fill out, nothing else to install.</p>
+             <p><a href="/chat"><button>Talk to it</button></a></p></div>
+           <div class="door"><h2>I already run a harness</h2>
+             <p>PAI, Claude Code, anything that speaks MCP — this becomes its sovereign identity and memory layer. Copy-ready install, your URL baked in.</p>
+             <p><a href="/connect"><button>Connect it</button></a></p></div>
+         </div>
+         <p class="promise">A promise, for the person who almost closed this tab: you will not need a terminal, an install, or anyone's permission. One button got you here; from here you just talk. If you get stuck anywhere, that is my failure, not yours.</p>
+         <p class="alt">Prefer forms? The <a href="/intake">five-question intake</a> still exists.</p>`),
         { headers: { "Content-Type": "text/html; charset=utf-8" } });
     }
     if (method === "GET" && path === "/api") {
