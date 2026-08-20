@@ -1,0 +1,16 @@
+{
+  "name": "northwoods-pack",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Public PAI v0.1 modular monolith — 5 capabilities in one Worker. First reference deployment in progress.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260501.0",
+    "typescript": "^5.4.0",
+    "wrangler": "^3.50.0"
+  }
+}
