@@ -45,8 +45,11 @@ export function handleIntakeForm(): Response {
 </style></head>
 <body>
   <h1>Your harness wants to meet you</h1>
-  <p>Five questions, in your own words. This seeds the identity your AI reads first —
-     on your account, in your database, changeable any time. Nothing here goes anywhere else.</p>
+  <p><strong>Prefer talking to typing?</strong> Skip this form: paste
+     <code id="mcpurl">(type your token below to see your MCP URL)</code> into Claude or any MCP client,
+     and your AI will interview you instead — one question at a time, drafts you approve, no blank boxes. It can also read who you are from things you show it: a photo of your bookshelf or desk, a page you wrote yourself before AI existed in your life. Evidence beats description.</p>
+  <p>Or, five questions in your own words. Rough one-liners are fine — day-one identity is a draft,
+     and corrections stick later. On your account, in your database, changeable any time.</p>
   <form id="f">
     <label for="token">Your pack token</label>
     <p class="hint">The DEMO_TOKEN secret you set at deploy. Proves this pot is yours.</p>
@@ -59,6 +62,10 @@ export function handleIntakeForm(): Response {
   </form>
   <div id="result"></div>
   <script>
+    document.getElementById('token').addEventListener('input', (e) => {
+      const t = e.target.value.trim();
+      document.getElementById('mcpurl').textContent = t ? (location.origin + '/mcp/' + t) : '(type your token below to see your MCP URL)';
+    });
     document.getElementById('f').addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(e.target).entries());

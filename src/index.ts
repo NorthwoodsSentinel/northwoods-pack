@@ -50,7 +50,7 @@ async function info(env: Env): Promise<Response> {
   return json({
     pack: "northwoods-pack",
     setup: needsToken ? { needed: true, how: TOKEN_HELP } : { needed: false },
-    version: "0.4.0",
+    version: "0.4.1",
     purpose:
       "Public PAI v0.3 — 1 Worker, 1-click install: identity + intake interview + MCP, so your AI knows you in ten minutes.",
     modules: {

@@ -22,6 +22,20 @@ const TOOLS = [
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
+    name: "set_identity",
+    description:
+      "Store one approved identity field during or after the intake interview. ONLY call this with wording the person has explicitly approved — draft it, read it back, then store. Keys: call_me, who_i_am, current_focus, voice_rules, anti_rules, contract.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        key: { type: "string", description: "call_me | who_i_am | current_focus | voice_rules | anti_rules | contract" },
+        value: { type: "string", description: "the approved text, in the person's own words" },
+      },
+      required: ["key", "value"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "recall_memories",
     description:
       "Search this person's memory store. Use plain keywords from the current topic.",
@@ -120,7 +134,7 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
     return rpcResult(id, {
       protocolVersion: PROTOCOL,
       capabilities: { tools: {} },
-      serverInfo: { name: "northwoods-pack", version: "0.4.0" },
+      serverInfo: { name: "northwoods-pack", version: "0.4.1" },
     });
   if (method === "notifications/initialized") return new Response(null, { status: 202 });
   if (method === "ping") return rpcResult(id, {});
@@ -132,10 +146,37 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
     try {
       if (name === "get_identity") {
         const doc = await getIdentityDoc(env);
+        // Empty pot => the connected AI becomes the intake. A blank form asks a
+        // person to articulate themselves cold — the exact skill this pack's
+        // cohort burns energy on. A conversation with drafts to approve doesn't.
         return rpcResult(
           id,
-          textContent(doc ?? "No identity seeded yet — the person hasn't run their intake interview."),
+          textContent(doc ?? [
+            "This pot is empty — and YOU are the intake. Interview the person you're talking to, gently, ONE question at a time, in this order:",
+            "1. What should I call you?  (store key: call_me)",
+            "2. Who are you? — let them ramble; offer to draft it FROM the ramble rather than asking for a clean answer.  (key: who_i_am)",
+            "3. What are you building or chasing right now?  (key: current_focus)",
+            "4. How should an AI speak to you? — offer concrete options to react to (direct? short? no pep talks? no option-lists?); recognition beats articulation.  (key: voice_rules)",
+            "5. What should an AI NEVER do with you? — again, offer examples: cheerleading, hedging, lectures, time pressure.  (key: anti_rules)",
+            "6. EVIDENCE BEATS DESCRIPTION — invite them to SHOW you instead of telling you: a photo of their bookshelf, their desk, their workbench, anything they live with. Describe what you actually see, guess gently at what it says about them, and let them correct you. Store each CONFIRMED observation with remember (type: context).",
+            "7. Ask for a piece of writing they made themselves, without AI — an old email, a journal scrap, a post. Store it verbatim with remember (type: voice_sample) — it is the seed their voice gets checked against later — and offer to draft who_i_am FROM their own words rather than asking them to produce a self-description cold.",
+            "RULES: one question per turn, never a form. After each answer, DRAFT the field in their words, read it back, and only call set_identity after they approve. If they correct you, that IS the data. Anything worth keeping beyond identity goes in remember.",
+          ].join("\n")),
         );
+      }
+      if (name === "set_identity") {
+        const key = String(args.key ?? "").trim();
+        const value = String(args.value ?? "").trim();
+        const VALID = ["call_me", "who_i_am", "current_focus", "voice_rules", "anti_rules", "contract"];
+        if (!VALID.includes(key)) return rpcResult(id, textContent(`key must be one of: ${VALID.join(", ")}`));
+        if (!value) return rpcResult(id, textContent("Empty value."));
+        await env.DB.prepare(
+          "INSERT INTO identity_fields (key, value, source, updated_at) VALUES (?, ?, 'interview-via-ai', ?) " +
+            "ON CONFLICT(key) DO UPDATE SET value = excluded.value, source = 'interview-via-ai', updated_at = excluded.updated_at",
+        )
+          .bind(key, value, Date.now())
+          .run();
+        return rpcResult(id, textContent(`Stored ${key}. Read the full identity back with get_identity when the interview feels done.`));
       }
       if (name === "recall_memories") {
         const q = String(args.query ?? "").trim();
