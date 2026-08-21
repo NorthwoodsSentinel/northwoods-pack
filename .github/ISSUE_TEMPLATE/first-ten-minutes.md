@@ -1,6 +1,6 @@
 ---
 name: First ten minutes
-about: You tried the install. Tell me what it was actually like — where you got stuck is worth more than what you liked.
+about: You tried the install. Tell me what it was actually like, where you got stuck is worth more than what you liked.
 title: "first ten minutes: "
 labels: first-ten-minutes
 ---

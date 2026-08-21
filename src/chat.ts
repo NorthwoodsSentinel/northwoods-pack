@@ -1,28 +1,27 @@
 /**
- * chat — the hand in the glove. The pack stops assuming you own a second AI:
+ * chat, the hand in the glove. The pack stops assuming you own a second AI:
  * this page talks, on YOUR Workers AI allocation, with your identity read
  * first and your memories in reach. On an empty pot it conducts the intake
- * itself — one question at a time, drafts you approve, evidence over
+ * itself, one question at a time, drafts you approve, evidence over
  * description. Born 2026-08-20 from the first stranger walk: "we still
  * haven't gotten to an AI yet."
  *
- * GET  /chat        — the page (token gate client-side; sends token per request)
- * POST /chat/send   — { token, messages:[{role,content}...] } → { reply }
+ * GET  /chat, the page (token gate client-side; sends token per request)
+ * POST /chat/send, { token, messages:[{role,content}...] } → { reply }
  *
  * Identity writes from the interview use a deterministic marker the worker
- * parses out of the model's reply: [[SAVE:key=...]] / [[REMEMBER:...]] —
- * stored server-side, stripped from the shown text. No client tooling needed.
+ * parses out of the model's reply: [[SAVE:key=...]] / [[REMEMBER:...]], * stored server-side, stripped from the shown text. No client tooling needed.
  */
 import { Env, json, invalidJson, newId } from "./common";
 import { getIdentityDoc } from "./identity";
 
 const MODEL = "@cf/meta/llama-4-scout-17b-16e-instruct";
 
-const INTERVIEWER = `The pot is empty, so this conversation IS the intake. Interview the person gently, ONE question at a time, in this order: what to call them (call_me); who they are — let them ramble and offer to draft it from the ramble (who_i_am); what they're building or chasing (current_focus); how an AI should speak to them — offer concrete options to react to (voice_rules); what an AI must never do with them — offer examples like cheerleading, hedging, lectures, time pressure (anti_rules). Also invite them to SHOW you things (a bookshelf, a desk) and to paste writing they made without AI — draft who_i_am from evidence, not interrogation. After they approve a field's wording, emit it on its own line exactly as: [[SAVE:key=approved text]] — the harness stores it and strips the marker. For other things worth keeping, emit [[REMEMBER:the memory]]. Never emit a marker for wording they have not approved. One question per turn. No bullet walls. No pep talks.`;
+const INTERVIEWER = `The pot is empty, so this conversation IS the intake. Interview the person gently, ONE question at a time, in this order: what to call them (call_me); who they are, let them ramble and offer to draft it from the ramble (who_i_am); what they're building or chasing (current_focus); how an AI should speak to them, offer concrete options to react to (voice_rules); what an AI must never do with them, offer examples like cheerleading, hedging, lectures, time pressure (anti_rules). Also invite them to SHOW you things (a bookshelf, a desk) and to paste writing they made without AI, draft who_i_am from evidence, not interrogation. After they approve a field's wording, emit it on its own line exactly as: [[SAVE:key=approved text]], the harness stores it and strips the marker. For other things worth keeping, emit [[REMEMBER:the memory]]. Never emit a marker for wording they have not approved. One question per turn. No bullet walls. No pep talks.`;
 
 function systemPrompt(identity: string | null, recalled: string): string {
   const parts: string[] = [
-    "You are this person's harness — their own AI, running on their own account. Plain prose. One thing at a time. Never present option-menus unless offering examples to react to. Never mention how long since they last spoke. A correction is an instruction: obey it and, if durable, emit [[REMEMBER:...]] or [[SAVE:voice_rules=...]] per the marker rules.",
+    "You are this person's harness, their own AI, running on their own account. Plain prose. One thing at a time. Never present option-menus unless offering examples to react to. Never mention how long since they last spoke. A correction is an instruction: obey it and, if durable, emit [[REMEMBER:...]] or [[SAVE:voice_rules=...]] per the marker rules.",
   ];
   if (identity) parts.push("WHO YOU ARE TALKING TO (read carefully, obey the contract):\n" + identity);
   else parts.push(INTERVIEWER);
@@ -91,7 +90,7 @@ export async function handleChatSend(request: Request, env: Env): Promise<Respon
     max_tokens: 800,
   } as any);
   const raw: string = ai?.response ?? ai?.choices?.[0]?.message?.content ?? "";
-  if (!raw) return json({ error: "The model returned nothing — Workers AI may be at its daily free allocation." }, 502);
+  if (!raw) return json({ error: "The model returned nothing. Workers AI may be at its daily free allocation." }, 502);
   const reply = await absorbMarkers(env, raw);
   return json({ reply });
 }

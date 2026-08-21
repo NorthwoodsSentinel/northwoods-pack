@@ -1,10 +1,10 @@
 /**
- * mcp — the felt win. One URL pasted into Claude, ChatGPT, or any MCP client,
+ * mcp, the felt win. One URL pasted into Claude, ChatGPT, or any MCP client,
  * and that AI knows its person: identity first, memories on demand, new
  * memories writable. Minimal Streamable-HTTP MCP server (JSON responses,
- * single-message exchanges — no SSE needed for this tool surface).
+ * single-message exchanges, no SSE needed for this tool surface).
  *
- * Route: POST /mcp/:token  — token in path because most chat clients accept a
+ * Route: POST /mcp/:token, token in path because most chat clients accept a
  * bare URL and no custom headers. It is the deployer's own token on their own
  * account; rotate by rotating DEMO_TOKEN. GET returns a human-readable hint.
  */
@@ -24,7 +24,7 @@ const TOOLS = [
   {
     name: "set_identity",
     description:
-      "Store one approved identity field during or after the intake interview. ONLY call this with wording the person has explicitly approved — draft it, read it back, then store. Keys: call_me, who_i_am, current_focus, voice_rules, anti_rules, contract.",
+      "Store one approved identity field during or after the intake interview. ONLY call this with wording the person has explicitly approved, draft it, read it back, then store. Keys: call_me, who_i_am, current_focus, voice_rules, anti_rules, contract.",
     inputSchema: {
       type: "object",
       properties: {
@@ -49,7 +49,7 @@ const TOOLS = [
   {
     name: "where_was_i",
     description:
-      "When the person returns — after an hour or a month — call this for one forward-leaning sentence to restart momentum. NEVER compute or mention how long they were gone; absence carries no debt here.",
+      "When the person returns, after an hour or a month, call this for one forward-leaning sentence to restart momentum. NEVER compute or mention how long they were gone; absence carries no debt here.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
@@ -66,7 +66,7 @@ const TOOLS = [
   {
     name: "whats_open",
     description:
-      "When the person asks what's on their shelf or what they left open, return ONE held thread — the harness never presents menus. They can ask again for the next, mark it done, or release it.",
+      "When the person asks what's on their shelf or what they left open, return ONE held thread, the harness never presents menus. They can ask again for the next, mark it done, or release it.",
     inputSchema: {
       type: "object",
       properties: { action: { type: "string", description: "next (default) | done:<id> | release:<id>" } },
@@ -147,19 +147,19 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
       if (name === "get_identity") {
         const doc = await getIdentityDoc(env);
         // Empty pot => the connected AI becomes the intake. A blank form asks a
-        // person to articulate themselves cold — the exact skill this pack's
+        // person to articulate themselves cold, the exact skill this pack's
         // cohort burns energy on. A conversation with drafts to approve doesn't.
         return rpcResult(
           id,
           textContent(doc ?? [
-            "This pot is empty — and YOU are the intake. Interview the person you're talking to, gently, ONE question at a time, in this order:",
+            "This pot is empty, and YOU are the intake. Interview the person you're talking to, gently, ONE question at a time, in this order:",
             "1. What should I call you?  (store key: call_me)",
-            "2. Who are you? — let them ramble; offer to draft it FROM the ramble rather than asking for a clean answer.  (key: who_i_am)",
+            "2. Who are you?, let them ramble; offer to draft it FROM the ramble rather than asking for a clean answer.  (key: who_i_am)",
             "3. What are you building or chasing right now?  (key: current_focus)",
-            "4. How should an AI speak to you? — offer concrete options to react to (direct? short? no pep talks? no option-lists?); recognition beats articulation.  (key: voice_rules)",
-            "5. What should an AI NEVER do with you? — again, offer examples: cheerleading, hedging, lectures, time pressure.  (key: anti_rules)",
-            "6. EVIDENCE BEATS DESCRIPTION — invite them to SHOW you instead of telling you: a photo of their bookshelf, their desk, their workbench, anything they live with. Describe what you actually see, guess gently at what it says about them, and let them correct you. Store each CONFIRMED observation with remember (type: context).",
-            "7. Ask for a piece of writing they made themselves, without AI — an old email, a journal scrap, a post. Store it verbatim with remember (type: voice_sample) — it is the seed their voice gets checked against later — and offer to draft who_i_am FROM their own words rather than asking them to produce a self-description cold.",
+            "4. How should an AI speak to you?, offer concrete options to react to (direct? short? no pep talks? no option-lists?); recognition beats articulation.  (key: voice_rules)",
+            "5. What should an AI NEVER do with you?, again, offer examples: cheerleading, hedging, lectures, time pressure.  (key: anti_rules)",
+            "6. EVIDENCE BEATS DESCRIPTION, invite them to SHOW you instead of telling you: a photo of their bookshelf, their desk, their workbench, anything they live with. Describe what you actually see, guess gently at what it says about them, and let them correct you. Store each CONFIRMED observation with remember (type: context).",
+            "7. Ask for a piece of writing they made themselves, without AI, an old email, a journal scrap, a post. Store it verbatim with remember (type: voice_sample), it is the seed their voice gets checked against later, and offer to draft who_i_am FROM their own words rather than asking them to produce a self-description cold.",
             "RULES: one question per turn, never a form. After each answer, DRAFT the field in their words, read it back, and only call set_identity after they approve. If they correct you, that IS the data. Anything worth keeping beyond identity goes in remember.",
           ].join("\n")),
         );
@@ -182,7 +182,7 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
         const q = String(args.query ?? "").trim();
         if (!q) return rpcResult(id, textContent("Empty query."));
         // loam's search layer: FTS5 match, then provenance join. Recall excludes
-        // sensitivity='secret' by default — the egress rule is bound at the query,
+        // sensitivity='secret' by default, the egress rule is bound at the query,
         // not left as advice (tag now, enforce here).
         const ftsQuery = q.split(/\s+/).slice(0, 6).map((t) => `"${t.replace(/"/g, "")}"`).join(" OR ");
         const rows = await env.DB.prepare(
@@ -210,12 +210,12 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
           "SELECT body FROM loops WHERE status='open' ORDER BY created_at DESC LIMIT 1",
         ).first<{ body: string }>();
         // One sentence, forward-leaning. Never timestamps, never counts, never
-        // verdicts about absence — the resume doctrine, served over MCP.
+        // verdicts about absence, the resume doctrine, served over MCP.
         const line = loop
           ? `Welcome back. The thread you asked me to hold: ${loop.body}`
           : snippet
             ? `Welcome back. Pick up where it was warm: ${snippet}`
-            : "Welcome back. Nothing's owed — start with what's on your mind right now.";
+            : "Welcome back. Nothing's owed, start with what's on your mind right now.";
         return rpcResult(id, textContent(line));
       }
       if (name === "hold_this") {
@@ -235,9 +235,9 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
           await env.DB.prepare("UPDATE loops SET status=?, closed_at=? WHERE id=?")
             .bind(m[1] === "done" ? "done" : "released", Date.now(), m[2])
             .run();
-          return rpcResult(id, textContent(m[1] === "done" ? "Closed. Good." : "Released — off the shelf, no ceremony."));
+          return rpcResult(id, textContent(m[1] === "done" ? "Closed. Good." : "Released, off the shelf, no ceremony."));
         }
-        // ONE loop at a time — a menu is how threads die and the person becomes
+        // ONE loop at a time, a menu is how threads die and the person becomes
         // the continuity. Oldest first, so nothing quietly rots at the bottom.
         const row = await env.DB.prepare(
           "SELECT id, body FROM loops WHERE status='open' ORDER BY created_at ASC LIMIT 1",
@@ -274,7 +274,7 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
           : "fact";
         const now = Date.now();
         const mid = newId();
-        // AI-carried content defaults trust_level='mixed' per loam doctrine — the
+        // AI-carried content defaults trust_level='mixed' per loam doctrine, the
         // person said it, the model relayed it; the distinction stays visible.
         await env.DB.batch([
           env.DB.prepare(

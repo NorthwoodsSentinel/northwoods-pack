@@ -1,24 +1,24 @@
 /**
- * intake — the first-run interview. Fixes the empty-pot problem at the door:
+ * intake, the first-run interview. Fixes the empty-pot problem at the door:
  * a deployed pack should learn its person in the first ten minutes, not ship
  * blank and hope they read API docs.
  *
- * GET  /intake         — the interview form (public: it renders; submitting needs the token)
- * POST /intake         — token-checked in the body; seeds identity_fields + substrate seeds
+ * GET  /intake, the interview form (public: it renders; submitting needs the token)
+ * POST /intake, token-checked in the body; seeds identity_fields + substrate seeds
  *
  * The questions are the distilled first-month needs of the operator arc this
  * pack generalizes: name, who-I-am, current focus, voice rules, anti-rules,
- * and a handful of things worth remembering — nothing clinical, nothing that
+ * and a handful of things worth remembering, nothing clinical, nothing that
  * reads like a chart. The person describes themself in their own words.
  */
 import { Env, json, invalidJson, newId } from "./common";
 
 const QUESTIONS: Array<{ key: string; label: string; hint: string; rows: number }> = [
-  { key: "call_me", label: "What should your AI call you?", hint: "A name, a handle — whatever feels right.", rows: 1 },
-  { key: "who_i_am", label: "Who are you, in your own words?", hint: "A few sentences. Not a resume — how you'd tell a new friend.", rows: 4 },
+  { key: "call_me", label: "What should your AI call you?", hint: "A name, a handle, whatever feels right.", rows: 1 },
+  { key: "who_i_am", label: "Who are you, in your own words?", hint: "A few sentences. Not a resume, how you'd tell a new friend.", rows: 4 },
   { key: "current_focus", label: "What are you building or chasing right now?", hint: "The thing you'd want your AI to hold steady across every conversation.", rows: 3 },
   { key: "voice_rules", label: "How should an AI speak to you?", hint: "Direct? Short? No pep talks? Explain like a colleague? Your rules.", rows: 3 },
-  { key: "anti_rules", label: "What should an AI never do with you?", hint: "The stuff that makes you close the tab. Cheerleading, hedging, lectures — name it.", rows: 3 },
+  { key: "anti_rules", label: "What should an AI never do with you?", hint: "The stuff that makes you close the tab. Cheerleading, hedging, lectures, name it.", rows: 3 },
 ];
 
 export function handleIntakeForm(): Response {
@@ -56,8 +56,8 @@ export function handleIntakeForm(): Response {
   <h1>Your harness wants to meet you</h1>
   <p><strong>Prefer talking to typing?</strong> Skip this form: paste
      <code id="mcpurl">(type your token below to see your MCP URL)</code> into Claude or any MCP client,
-     and your AI will interview you instead — one question at a time, drafts you approve, no blank boxes. It can also read who you are from things you show it: a photo of your bookshelf or desk, a page you wrote yourself before AI existed in your life. Evidence beats description.</p>
-  <p>Or, five questions in your own words. Rough one-liners are fine — day-one identity is a draft,
+     and your AI will interview you instead, one question at a time, drafts you approve, no blank boxes. It can also read who you are from things you show it: a photo of your bookshelf or desk, a page you wrote yourself before AI existed in your life. Evidence beats description.</p>
+  <p>Or, five questions in your own words. Rough one-liners are fine, day-one identity is a draft,
      and corrections stick later. On your account, in your database, changeable any time.</p>
   <form id="f">
     <label for="token">Your pack token</label>
@@ -65,7 +65,7 @@ export function handleIntakeForm(): Response {
     <input id="token" name="token" type="password" />
     ${fields}
     <label for="seed_memories" class="memories-note">Anything your AI should already remember?</label>
-    <p class="hint">One per line. People, projects, context — the stuff you're tired of re-explaining.</p>
+    <p class="hint">One per line. People, projects, context, the stuff you're tired of re-explaining.</p>
     <textarea id="seed_memories" name="seed_memories" rows="4"></textarea>
     <button type="submit">Seed my harness</button>
   </form>
@@ -102,7 +102,7 @@ export async function handleIntakeSubmit(
     return invalidJson();
   }
   if (!body.token || body.token !== env.DEMO_TOKEN)
-    return json({ error: "Bad token — use the DEMO_TOKEN you set at deploy" }, 401);
+    return json({ error: "Bad token, use the DEMO_TOKEN you set at deploy" }, 401);
 
   const now = Date.now();
   const stmts = [];

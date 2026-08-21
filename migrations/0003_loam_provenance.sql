@@ -1,10 +1,10 @@
 -- v0.3.1: loam's provenance model, verbatim in principle and mostly in column.
--- (github.com/NorthwoodsSentinel/loam — "Healthy soil knows where each grain came from.")
+-- (github.com/NorthwoodsSentinel/loam. "Healthy soil knows where each grain came from.")
 --
 --   source        where a memory came from (intake | mcp | api)
---   trust_level   untrusted | mixed | trusted — AI-carried content defaults mixed;
+--   trust_level   untrusted | mixed | trusted. AI-carried content defaults mixed;
 --                 the person's own interview answers default trusted
---   sensitivity   public | personal | memoir-class | secret — recall EXCLUDES
+--   sensitivity   public | personal | memoir-class | secret, recall EXCLUDES
 --                 'secret' by default; egress rules read this column, per loam's
 --                 tag-now-so-rules-can-come-later doctrine
 --

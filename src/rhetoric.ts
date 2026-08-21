@@ -1,5 +1,5 @@
 /**
- * Rhetoric module — output transformer.
+ * Rhetoric module, output transformer.
  *
  * Strips emoji-headed sections + emoji bullets (preserves visual scanning rhythm).
  * Splits long sentences on coordinating conjunctions (keeps clauses short, preserves vocabulary).
@@ -62,7 +62,7 @@ function splitLongSentences(text: string): {
     const rewritten = sentences.map((s) => {
       const wc = s.trim().split(/\s+/).length;
       if (wc <= MAX_SENTENCE_WORDS) return s;
-      const parts = s.split(/\s*(?:;|—|–| - )\s*/);
+      const parts = s.split(/\s*(?:;|, |–| - )\s*/);
       if (parts.length > 1) {
         changed = true;
         return parts.map((p) => p.trim()).filter(Boolean).join(". ");

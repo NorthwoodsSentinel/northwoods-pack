@@ -1,4 +1,4 @@
--- v0.4: the Shelf — open loops held by the harness instead of the person's head.
+-- v0.4: the Shelf, open loops held by the harness instead of the person's head.
 -- The ADHD reality this serves: hyperfocus ends, life interrupts, and every other
 -- tool charges guilt-interest on the way back in. Loops here are parked, not owed.
 -- No due dates by design. Nothing in this table can nag.

@@ -1,5 +1,5 @@
 /**
- * Substrate module — persistent memory store backed by D1 + KV.
+ * Substrate module, persistent memory store backed by D1 + KV.
  *
  * Exports getLatestEntry() for the resume module to call directly
  * (no more service-binding round-trip).
@@ -159,7 +159,7 @@ export async function handleList(url: URL, env: Env): Promise<Response> {
 }
 
 /**
- * Internal function — called by resume module directly. No HTTP round-trip.
+ * Internal function, called by resume module directly. No HTTP round-trip.
  */
 export async function getLatestEntry(env: Env): Promise<SubstrateEntry | null> {
   const result = await env.DB.prepare(

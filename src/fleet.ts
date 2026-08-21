@@ -1,5 +1,5 @@
 /**
- * Fleet module — model router via Workers AI.
+ * Fleet module, model router via Workers AI.
  *
  * Routes the task through the right backend based on a hint.
  * US-residency models preferred (per substrate-sovereignty doctrine).
@@ -23,28 +23,28 @@ function chooseModel(hint?: string): RouteDecision {
     case "code":
       return {
         model: "@cf/meta/llama-4-scout-17b-16e-instruct",
-        reason: "Llama 4 Scout — US residency, strong code reasoning",
+        reason: "Llama 4 Scout. US residency, strong code reasoning",
       };
     case "translate":
       return {
         model: "@cf/mistralai/mistral-small-3.1-24b-instruct",
-        reason: "Mistral Small 3.1 — multilingual specialty",
+        reason: "Mistral Small 3.1, multilingual specialty",
       };
     case "reflect":
       return {
         model: "@cf/google/gemma-3-12b-it",
-        reason: "Gemma 3 — measured, reflective register",
+        reason: "Gemma 3, measured, reflective register",
       };
     case "research":
     case "factcheck":
       return {
         model: "@cf/meta/llama-4-scout-17b-16e-instruct",
-        reason: `${hint} stubbed to Llama 4 Scout in v0.2 — v0.3 routes to external Perplexity`,
+        reason: `${hint} stubbed to Llama 4 Scout in v0.2, v0.3 routes to external Perplexity`,
       };
     default:
       return {
         model: "@cf/meta/llama-4-scout-17b-16e-instruct",
-        reason: "Default — Llama 4 Scout (US residency)",
+        reason: "Default. Llama 4 Scout (US residency)",
       };
   }
 }

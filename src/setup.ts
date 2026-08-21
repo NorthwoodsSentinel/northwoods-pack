@@ -1,18 +1,18 @@
 /**
- * setup — the two failure modes a fresh deploy-button install can hit, made
+ * setup, the two failure modes a fresh deploy-button install can hit, made
  * impossible to hit silently. Born from a live doubt ("honestly I doubt you
  * smoke tested this") that was correct: the worker was smoke-tested, the
  * stranger's install path was not.
  *
  * 1. ensureSchema(): a fresh D1 has no tables if the deploy flow didn't run
  *    migrations. Rather than 500 at minute six of the ten-minute path, the
- *    consolidated schema (all migrations, final shape) is applied lazily —
+ *    consolidated schema (all migrations, final shape) is applied lazily,
  *    every statement idempotent, so it costs one cheap no-op batch on a DB
  *    that's already set up.
  *
  * 2. tokenIsDefault(): shipping a plaintext placeholder token means every
  *    installer who misses it shares one publicly-known key. The worker
- *    refuses to operate on the default — fail closed, with the exact fix
+ *    refuses to operate on the default, fail closed, with the exact fix
  *    printed where the person is standing.
  */
 import { Env } from "./common";
@@ -24,11 +24,11 @@ export function tokenIsDefault(env: Env): boolean {
 }
 
 export const TOKEN_HELP =
-  "This pot is still locked with the factory token, so it refuses to work — otherwise every install would share one public key. " +
+  "This pot is still locked with the factory token, so it refuses to work, otherwise every install would share one public key. " +
   "Set your own: in your Cloudflare dashboard open this Worker → Settings → Variables and Secrets, replace DEMO_TOKEN with a long random string " +
   "(or run: npx wrangler secret put DEMO_TOKEN). Then come back here.";
 
-// The final shape of every table, as CREATE IF NOT EXISTS — a fresh database
+// The final shape of every table, as CREATE IF NOT EXISTS, a fresh database
 // arrives complete; an existing one is untouched.
 const SCHEMA: string[] = [
   `CREATE TABLE IF NOT EXISTS substrate_entries (

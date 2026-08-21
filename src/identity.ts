@@ -1,10 +1,10 @@
 /**
- * identity — the Layer-3 store: who you are, your decision principles, and how
+ * identity, the Layer-3 store: who you are, your decision principles, and how
  * an AI should speak to you. The seed of every voice-fit journey ("tailor how
  * you respond to me") graduated into an architectural layer.
  *
  * Every field carries provenance (source: interview | api). The assembled doc
- * is what an AI reads FIRST — before memories — so the person arrives as a
+ * is what an AI reads FIRST, before memories, so the person arrives as a
  * person, not as a search result.
  */
 import { Env, json, invalidJson } from "./common";
@@ -34,8 +34,8 @@ export async function getIdentityDoc(env: Env): Promise<string | null> {
   if (map.get("anti_rules"))
     parts.push(`## Never do this with me\n${map.get("anti_rules")}`);
   // The Contract: standing operating rules every AI reading this identity is
-  // asked to obey. The cohort defaults — one thing at a time, no menus, no
-  // clocks, no absence-guilt — are the accessibility layer, stated as conduct
+  // asked to obey. The cohort defaults, one thing at a time, no menus, no
+  // clocks, no absence-guilt, are the accessibility layer, stated as conduct
   // rather than as anything about the person. Editable like any identity field.
   parts.push(map.get("contract") ?? [
     "## Operating contract for any AI reading this",
@@ -52,7 +52,7 @@ export async function handleIdentityGet(env: Env): Promise<Response> {
   const doc = await getIdentityDoc(env);
   if (doc === null)
     return json(
-      { identity: null, note: "Empty — run the intake interview at GET /intake" },
+      { identity: null, note: "Empty, run the intake interview at GET /intake" },
       200,
     );
   return json({ identity: doc });

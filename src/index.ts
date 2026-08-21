@@ -1,16 +1,16 @@
 /**
- * northwoods-pack — modular monolith
+ * northwoods-pack, modular monolith
  *
  * Single Worker housing 5 capability modules:
- *   /rhetoric/transform   — output transformer (POST)
- *   /substrate/remember   — store memory entry (POST)
- *   /substrate/recall     — search memory (POST)
- *   /substrate/list       — list by tag/type (GET)
- *   /resume/momentum      — momentum-restart pivot (GET)
- *   /fleet/route          — Workers AI router (POST)
- *   /mycelia/ask          — opt-in help post (POST)
- *   /mycelia/open         — opt-in help list (GET)
- *   /                     — pack info + module status (GET)
+ *   /rhetoric/transform, output transformer (POST)
+ *   /substrate/remember, store memory entry (POST)
+ *   /substrate/recall, search memory (POST)
+ *   /substrate/list, list by tag/type (GET)
+ *   /resume/momentum, momentum-restart pivot (GET)
+ *   /fleet/route. Workers AI router (POST)
+ *   /mycelia/ask, opt-in help post (POST)
+ *   /mycelia/open, opt-in help list (GET)
+ *   /, pack info + module status (GET)
  *
  * This is the 1-click Deploy Button shape for v0.2.
  * The 5-Worker version (workers/northwoods-{rhetoric,substrate,resume,fleet,mycelia}/)
@@ -71,7 +71,7 @@ async function info(env: Env): Promise<Response> {
     setup: needsToken ? { needed: true, how: TOKEN_HELP } : { needed: false },
     version: "0.5.0",
     purpose:
-      "Public PAI v0.3 — 1 Worker, 1-click install: identity + intake interview + MCP, so your AI knows you in ten minutes.",
+      "Public PAI v0.3. 1 Worker, 1-click install: identity + intake interview + MCP, so your AI knows you in ten minutes.",
     modules: {
       rhetoric: { paths: ["POST /rhetoric/transform"] },
       substrate: {
@@ -91,7 +91,7 @@ async function info(env: Env): Promise<Response> {
       identity: { paths: ["GET /identity", "PUT /identity"] },
       intake: { paths: ["GET /intake (the interview)", "POST /intake"] },
       mcp: {
-        paths: ["POST /mcp/:token — MCP server (get_identity, recall_memories, remember, correct_me)"],
+        paths: ["POST /mcp/:token. MCP server (get_identity, recall_memories, remember, correct_me)"],
         felt_win: "paste your MCP URL into Claude or any MCP client; your AI knows you",
       },
     },
@@ -118,7 +118,7 @@ export default {
       if (tokenIsDefault(env)) {
         return new Response(landing(
           "One step left before this is yours",
-          "The pack ships locked with a factory token — otherwise every install would share one public key. In your Cloudflare dashboard open this Worker → <b>Settings → Variables and Secrets</b>, replace <code>DEMO_TOKEN</code> with a long random string of your own, and reload this page.",
+          "The pack ships locked with a factory token, otherwise every install would share one public key. In your Cloudflare dashboard open this Worker → <b>Settings → Variables and Secrets</b>, replace <code>DEMO_TOKEN</code> with a long random string of your own, and reload this page.",
           ""), { headers: { "Content-Type": "text/html; charset=utf-8" } });
       }
       await ensureSchema(env);
@@ -126,16 +126,16 @@ export default {
         "Your harness is alive",
         "It runs on your account, keeps everything in your database, and talks with its own built-in AI. Nothing here belongs to anyone but you.",
         `<div class="doors">
-           <div class="door"><h2>I'm new — no AI setup, no terminal</h2>
+           <div class="door"><h2>I'm new, no AI setup, no terminal</h2>
              <p>Then just talk. The first conversation is the introduction: it asks, you answer, nothing to fill out, nothing else to install.</p>
              <p><a href="/chat"><button>Talk to it</button></a></p></div>
            <div class="door"><h2>I already run a harness</h2>
-             <p>PAI, Claude Code, anything that speaks MCP — this becomes its sovereign identity and memory layer. Copy-ready install, your URL baked in.</p>
+             <p>PAI, Claude Code, anything that speaks MCP, this becomes its sovereign identity and memory layer. Copy-ready install, your URL baked in.</p>
              <p><a href="/connect"><button>Connect it</button></a></p></div>
          </div>
          <p class="promise">A promise, for the person who almost closed this tab: you will not need a terminal, an install, or anyone's permission. One button got you here; from here you just talk. If you get stuck anywhere, that is my failure, not yours.</p>
          <p class="alt">Prefer forms? The <a href="/intake">five-question intake</a> still exists.
-         Lost your token? You own this — set a new one in your Cloudflare dashboard (Worker → Settings → Variables and Secrets); your memories stay.
+         Lost your token? You own this, set a new one in your Cloudflare dashboard (Worker → Settings → Variables and Secrets); your memories stay.
          And everything here is yours to take: <code>/export</code> hands you the whole pot as one file.</p>`),
         { headers: { "Content-Type": "text/html; charset=utf-8" } });
     }

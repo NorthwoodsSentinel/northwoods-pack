@@ -1,5 +1,5 @@
 /**
- * Mycelia module — opt-in cross-fleet help channel.
+ * Mycelia module, opt-in cross-fleet help channel.
  *
  * OFF BY DEFAULT. Caller must send X-Mycelia-Opt-In: true on every request.
  * v0.2 is a structural stub: endpoints exist, contract enforced, no cross-fleet wiring yet.
@@ -48,7 +48,7 @@ export async function handleAsk(
   return json({
     acknowledged: true,
     note:
-      "v0.2 stub — your question was received but the cross-fleet wiring isn't built yet. Coming in v0.3.",
+      "v0.2 stub, your question was received but the cross-fleet wiring isn't built yet. Coming in v0.3.",
     received: { question: body.question, context: body.context ?? null },
   });
 }
@@ -62,6 +62,6 @@ export async function handleOpen(
 
   return json({
     open: [],
-    note: "v0.2 stub — no cross-fleet wiring yet, so always empty.",
+    note: "v0.2 stub, no cross-fleet wiring yet, so always empty.",
   });
 }

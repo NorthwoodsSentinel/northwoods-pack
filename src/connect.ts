@@ -1,9 +1,9 @@
 /**
- * connect — the harness walks you through installing itself into bigger AIs.
+ * connect, the harness walks you through installing itself into bigger AIs.
  * Born from the nine-hop walk of 2026-08-20: the person should never have to
  * compose a terminal command or hunt a settings pane; the worker hands them
  * everything pre-baked, one copy button per destination.
- * GET /connect — token typed client-side, never leaves the page except inside
+ * GET /connect, token typed client-side, never leaves the page except inside
  * the URLs it assembles for you.
  */
 export function handleConnectPage(): Response {
@@ -33,7 +33,7 @@ export function handleConnectPage(): Response {
   <p>Your harness already talks on its own at <a href="/chat">/chat</a>. Connecting it to Claude or another
      AI is the upgrade, not the requirement. Type your pack token and everything below fills itself in.</p>
   <input id="tok" type="password" placeholder="your pack token" />
-  <p class="note">The token stays on this page — it's only used to assemble your personal URLs below. Treat those URLs as secrets.</p>
+  <p class="note">The token stays on this page, it's only used to assemble your personal URLs below. Treat those URLs as secrets.</p>
 
   <div class="dest"><h2>Claude Code (terminal)</h2>
     <p class="note">One command, then restart Claude Code. Tools appear on the next session.</p>
@@ -47,7 +47,7 @@ export function handleConnectPage(): Response {
     <p class="note">Transport: HTTP. Same URL as above. Tools: get_identity, recall_memories, remember, correct_me, where_was_i, hold_this, whats_open, set_identity.</p></div>
 
   <p class="note">Hardening, when you're done testing: in Cloudflare, move DEMO_TOKEN from a variable to a Secret
-     (same Settings page, one click) — and if this URL ever ends up in a screenshot or a shared repo, rotate the
+     (same Settings page, one click), and if this URL ever ends up in a screenshot or a shared repo, rotate the
      token; the old URL dies instantly.</p>
   <script>
     const tok = document.getElementById('tok');

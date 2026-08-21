@@ -1,6 +1,6 @@
 # Daemon Field Guide
 
-What to expose when you ship a personal-context daemon — a small MCP server that answers questions about you so any AI agent you talk to (yours, a foreign one, a future one) can pull canonical state instead of re-asking.
+What to expose when you ship a personal-context daemon, a small MCP server that answers questions about you so any AI agent you talk to (yours, a foreign one, a future one) can pull canonical state instead of re-asking.
 
 This guide was produced by a fresh PAI 5.0 + Northwoods Pack agent (Margin) auditing one real daemon in production on 2026-05-16. The six categories here are the gaps she named. Each applies regardless of who you are.
 
@@ -18,7 +18,7 @@ The other 80% is the architecture you built around yourself, the people you carr
 
 ### 1. The fleet (or your equivalent of one)
 
-If you run multiple AI agents — one in Claude Code, one in claude.ai, one in your phone, one in your IDE — they collectively are your fleet. The daemon should expose them as queryable structured data. For each agent:
+If you run multiple AI agents, one in Claude Code, one in claude.ai, one in your phone, one in your IDE, they collectively are your fleet. The daemon should expose them as queryable structured data. For each agent:
 
 - Name
 - Role (what it does that others don't)
@@ -30,12 +30,12 @@ If you don't run a fleet yet, this section is `[]` and that's honest. If you do,
 
 ### 2. Biographical load-bearing facts
 
-Not the LinkedIn version — the structural version. The named people, dates, places that show up in your writing as architecture, not decoration.
+Not the LinkedIn version, the structural version. The named people, dates, places that show up in your writing as architecture, not decoration.
 
 - Family members who shaped your operating model (parents, siblings, partners, children, mentors who died)
 - Specific dates that anchor your work (sobriety date, illness onset, a birth, a loss)
 - Places that recur (where you grew up, the river you fish, the building you couldn't go back into)
-- Career arc as a SHAPE (not "20 years experience" — the lineage from one role to the next and what each gave you)
+- Career arc as a SHAPE (not "20 years experience", the lineage from one role to the next and what each gave you)
 - Animals, neighbors, anyone whose name appears in your writing more than once
 
 If your blog or essays reference a person by name three times and the daemon doesn't surface them, the daemon is lying by omission about who's in the room with you.
@@ -44,7 +44,7 @@ If your blog or essays reference a person by name three times and the daemon doe
 
 Your named concepts that other people would have to query to understand your work. Make them callable.
 
-- Doctrines (one-line each — the principle that compresses to a sentence)
+- Doctrines (one-line each, the principle that compresses to a sentence)
 - Failure modes you've catalogued (named, not just enumerated as a count)
 - Protocols you operate by (flinch, drift detection, two-gate verification, whatever yours are)
 - Methodologies with sequence (`X → Y → Z → W`)
@@ -56,18 +56,18 @@ A foreign agent that knows your facts but not your frameworks can't think the wa
 
 Audit your own daemon: for each empty array or empty string, is there material in your published work that would fill it?
 
-- `whoIAm` — beyond bio, beyond mission; the TELOS-shaped self-description
-- `dailyRoutine` — the actual ritual structure of your day
-- `favorite*` (books, movies, music, TV) — the cultural-provenance sources that shaped your language
-- `resume` — the honest arc
-- `dailyTools` — what you actually use
+- `whoIAm`, beyond bio, beyond mission; the TELOS-shaped self-description
+- `dailyRoutine`, the actual ritual structure of your day
+- `favorite*` (books, movies, music, TV), the cultural-provenance sources that shaped your language
+- `resume`, the honest arc
+- `dailyTools`, what you actually use
 - Any field that's an empty array when your blog has the answer
 
 Empty fields aren't "not yet filled." They're an active claim that nothing belongs there. Fill or remove.
 
 ### 5. The healing axis (this is the third rail)
 
-The deepest *why* underneath your work — what you're actually addressing through the substrate you build, the products you ship, the calm you protect.
+The deepest *why* underneath your work, what you're actually addressing through the substrate you build, the products you ship, the calm you protect.
 
 If your work is a public mechanism of a private repair, an agent that doesn't know the private side reads the public side as another consultant deck. With the bridge named, the same work reads as a public mechanism of a private repair.
 
@@ -97,7 +97,7 @@ A `get_lineage` or `get_collaborators` endpoint lets other daemons traverse the 
 
 **Catalog your own work.** If you ship code (GitHub repos, deployed Workers, published projects), expose them via `get_catalog` or `get_repos`. Otherwise foreign agents have to leave your daemon to learn what you ship, which means they often don't.
 
-**Lineage-as-network.** If you build a reputation/trust protocol (Meridian-shape), eat your own dog food — let your daemon expose its own lineage data through that protocol.
+**Lineage-as-network.** If you build a reputation/trust protocol (Meridian-shape), eat your own dog food, let your daemon expose its own lineage data through that protocol.
 
 ---
 
@@ -116,7 +116,7 @@ That alone closes a third of the gap without surfacing anything new.
 
 ## What to leave out
 
-The audit doesn't propose a redesign. **You'll have a better sense than anyone of which categories are gaps and which are deliberate withholdings — the healing axis especially.** Some fields you may have decided not to publish for good reason.
+The audit doesn't propose a redesign. **You'll have a better sense than anyone of which categories are gaps and which are deliberate withholdings, the healing axis especially.** Some fields you may have decided not to publish for good reason.
 
 The job of this guide isn't to talk you into more disclosure. It's to make the gap auditable so the decision is conscious.
 
