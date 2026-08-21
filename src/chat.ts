@@ -127,6 +127,7 @@ export function handleChatPage(): Response {
   </div>
   <div id="log" hidden></div>
   <form id="cf" hidden><input id="box" type="text" autocomplete="off" placeholder="say something" /><button>Send</button></form>
+  <p id="foot" hidden style="font-size:.78rem;color:#A9B0A6;margin:.3rem 0 0">Your harness carries load; it is not a therapist or a doctor. In crisis, reach a human: 988 (US) or your local line.</p>
   <script>
     const msgs = [];
     const log = document.getElementById('log');
@@ -139,7 +140,7 @@ export function handleChatPage(): Response {
     }
     function enter() {
       document.getElementById('gate').hidden = true;
-      log.hidden = false; document.getElementById('cf').hidden = false;
+      log.hidden = false; document.getElementById('cf').hidden = false; document.getElementById('foot').hidden = false;
       if (!msgs.length) { send('hello'); }
     }
     async function send(text) {

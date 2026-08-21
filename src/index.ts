@@ -134,11 +134,30 @@ export default {
              <p><a href="/connect"><button>Connect it</button></a></p></div>
          </div>
          <p class="promise">A promise, for the person who almost closed this tab: you will not need a terminal, an install, or anyone's permission. One button got you here; from here you just talk. If you get stuck anywhere, that is my failure, not yours.</p>
-         <p class="alt">Prefer forms? The <a href="/intake">five-question intake</a> still exists.</p>`),
+         <p class="alt">Prefer forms? The <a href="/intake">five-question intake</a> still exists.
+         Lost your token? You own this — set a new one in your Cloudflare dashboard (Worker → Settings → Variables and Secrets); your memories stay.
+         And everything here is yours to take: <code>/export</code> hands you the whole pot as one file.</p>`),
         { headers: { "Content-Type": "text/html; charset=utf-8" } });
     }
     if (method === "GET" && path === "/api") {
       return info(env);
+    }
+    // The door out: everything, as JSONL, gated by the token. Sovereignty that
+    // can't leave isn't sovereignty. (Council catch, 2026-08-20.)
+    if (method === "GET" && path === "/export") {
+      const t = url.searchParams.get("token") || request.headers.get("X-Pack-Token") || "";
+      if (!t || t !== env.DEMO_TOKEN) return unauthorized();
+      await ensureSchema(env);
+      const idn = await env.DB.prepare("SELECT key, value, source, updated_at FROM identity_fields").all();
+      const mem = await env.DB.prepare("SELECT * FROM substrate_entries ORDER BY created_at").all();
+      const lps = await env.DB.prepare("SELECT * FROM loops ORDER BY created_at").all();
+      const lines: string[] = [];
+      for (const r of idn.results ?? []) lines.push(JSON.stringify({ record: "identity", ...r }));
+      for (const r of mem.results ?? []) lines.push(JSON.stringify({ record: "memory", ...r }));
+      for (const r of lps.results ?? []) lines.push(JSON.stringify({ record: "loop", ...r }));
+      return new Response(lines.join("\n") + "\n", {
+        headers: { "Content-Type": "application/x-ndjson", "Content-Disposition": 'attachment; filename="my-harness-export.jsonl"' },
+      });
     }
     if (method === "GET" && path === "/connect") {
       if (tokenIsDefault(env)) return json({ error: TOKEN_HELP }, 503);
