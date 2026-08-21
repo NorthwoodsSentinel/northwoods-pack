@@ -36,6 +36,7 @@ If you're like me in every way except that computers intimidate you — if you'v
 
 ### Door 1 — you don't run any AI setup today
 
+0. **No Cloudflare account? That's the quickest step of all.** Go to [dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up), sign up with Google (or Apple, GitHub, or plain email), and take the **free plan** — the free tier is everything this needs. No credit card.
 1. **Click the Deploy button** at the top. Cloudflare creates everything on your account and shows you each piece before it builds. When it asks for `DEMO_TOKEN`, type any long made-up password and save it somewhere — it's the key to your pot.
 2. **Open your new worker's URL.** The front door greets you; click **Talk to it**.
 3. **Talk.** The first conversation is the introduction. That's the whole install.
