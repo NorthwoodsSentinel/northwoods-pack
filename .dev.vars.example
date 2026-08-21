@@ -1,3 +1,6 @@
-# Your pack token - the key to your pot. Any long random string (a password-manager
-# generate is perfect). Save it: it unlocks /chat, /intake, and forms your MCP URL.
+# Your pack token - the key to your pot. Paste ANY long random string here
+# (a password-manager generate is perfect). There is no "right" value; you
+# are inventing your own key. SAVE IT: you enter it once on your first visit,
+# and it forms your MCP URL. Lose it later? Set a new one in the dashboard;
+# your memories stay.
 DEMO_TOKEN=

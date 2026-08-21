@@ -5,7 +5,7 @@
   "description": "Public PAI v0.1 modular monolith \u2014 5 capabilities in one Worker. First reference deployment in progress.",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler d1 migrations apply DB --remote && wrangler deploy",
+    "deploy": "wrangler d1 migrations apply DB --remote && node scripts/after-install.mjs",
     "tail": "wrangler tail"
   },
   "devDependencies": {
