@@ -1,6 +1,4 @@
-# 🌲 northwoods-pack
-
-### An AI that carries your load without charging you shame.
+![northwoods-pack — an AI that carries your load without charging you shame](docs/img/banner.svg)
 
 **One button. Five minutes. A harness that runs on *your* Cloudflare account, learns *you*, and answers to nobody else.**
 
