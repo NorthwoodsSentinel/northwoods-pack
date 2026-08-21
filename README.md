@@ -30,7 +30,7 @@ This pack is that harness, generalized — my own tools with my identity removed
 
 ## A promise, for the person who almost closed this tab
 
-If you're like me in every way except that computers intimidate you — if you've been using an AI through a website chat because installs and terminals have always felt like someone else's country — **this was built for you first.** You will not install anything on your machine. You will not open a terminal. You will not need anyone's permission. You click one button, sign in, make up one password when asked, and then you open your new page and *talk* — like the chat sites you already use, except this one is yours, remembers you, speaks the way you tell it to, and answers to nobody else. If you get stuck anywhere along that road, that is my failure, not yours — [tell me exactly where](../../issues/new?template=first-ten-minutes.md) and I will fix the road.
+If you're like me in every way except that computers intimidate you — if you've been using an AI through a website chat because installs and terminals have always felt like someone else's country — **this was built for you first.** You will not install anything on your machine. You will not open a terminal. You will not need anyone's permission. You click one button, sign in, make up one password when asked, and then you open your new page and *talk* — like the chat sites you already use, except this one is yours, remembers you, speaks the way you tell it to, and answers to nobody else. And the unasked question, answered plainly: **everyday use costs nothing.** The built-in AI is included in the free account you just made. If you get stuck anywhere along that road, that is my failure, not yours — [tell me exactly where](../../issues/new?template=first-ten-minutes.md) and I will fix the road.
 
 ---
 
@@ -65,6 +65,14 @@ PAI, Claude Code, Claude on the web, or anything that speaks MCP: this pack beco
 **The form intake** (the fallback for people who prefer typing into quiet):
 
 ![The five-question intake](docs/img/intake.png)
+
+## The sovereign package, and what it honestly costs
+
+Everything here runs inside a **free Cloudflare account**: the Worker, your database, and the built-in AI — which is drawn from the free daily allocation of Workers AI that every account gets (10,000 "neurons" a day, resetting every day). The models are open-source — Llama, Qwen, Mistral, Gemma, OpenAI's open-weight gpt-oss — running in *your* tenant. Nobody sits between you and your AI, and nobody bills you for meeting it.
+
+**The honest limits:** the daily free allocation supports roughly a few dozen good exchanges a day on the default model — real daily companionship, not unlimited chatter. Heavy days can run the allocation out; it refills the next day. Your database and worker sit comfortably inside the free tier for years of personal use.
+
+**If you outgrow the free day:** Cloudflare's paid Workers plan ($5/month) unlocks metered use beyond the daily grant — same account, same open models, still yours. What it does and costs is stated plainly on Cloudflare's own pages: [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) and [the Workers plans page](https://developers.cloudflare.com/workers/platform/pricing/). Read those, not my summary — prices are theirs to state. Nothing in this pack changes either way, and this repo never sees a cent of it.
 
 ## Under the hood, for the builders
 
