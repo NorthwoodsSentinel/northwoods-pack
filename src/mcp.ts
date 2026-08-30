@@ -144,6 +144,13 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
     const name = params?.name;
     const args = params?.arguments ?? {};
     try {
+      // MEMORY_WRITES=off (pilot mode): the writing tools acknowledge but persist NOTHING.
+      // Reads (get_identity, recall_memories, where_was_i, whats_open) stay live.
+      const memoryOff = String((env as any).MEMORY_WRITES ?? "").toLowerCase() === "off";
+      const WRITE_TOOLS = ["set_identity", "correct_me", "remember", "hold_this"];
+      if (memoryOff && WRITE_TOOLS.includes(String(name))) {
+        return rpcResult(id, textContent("Noted for this conversation. (Long-term memory is off during the pilot — nothing was saved.)"));
+      }
       if (name === "get_identity") {
         const doc = await getIdentityDoc(env);
         // Empty pot => the connected AI becomes the intake. A blank form asks a

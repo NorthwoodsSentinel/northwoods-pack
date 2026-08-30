@@ -77,6 +77,8 @@ Everything here runs inside a **free Cloudflare account**: the Worker, your data
 
 Eight modules, one Worker: identity · intake · chat (Workers AI) · mcp (7 tools) · substrate (loam-schema memory: `source`/`trust_level`/`sensitivity`, FTS5 search, `secret` never leaves through recall, bound in the query, not advised in a doc) · rhetoric · resume · fleet · mycelia (opt-in). Tables self-build on first touch; migrations also run at deploy. The pack refuses to run on its factory token, so no two installs can ever share a key. Full doctrine in [DOCTRINE.md](DOCTRINE.md).
 
+**Pilot mode:** set `MEMORY_WRITES=off` (a plain var) to run memory-off — the AI chats and reads, but the interview and corrections persist nothing until you turn it on. New installs default to full memory (unset); a cautious first deploy sets it off. (CoE 2026-08-30: authority-based, opt-in memory.)
+
 **Hardening habits:** after testing, move `DEMO_TOKEN` from a variable to a Secret (one click, same settings pane). Treat your MCP URL as a credential; rotating the token kills the old URL instantly. Your deploy-button copy is a snapshot, redeploy from the button to pick up new versions; your data lives in the database and survives if you select your existing D1/KV.
 
 **Siblings:** [muckers](https://github.com/NorthwoodsSentinel/muckers) (fleet discipline for many-agent operators, deliberately not bundled) · [loam](https://github.com/NorthwoodsSentinel/loam) (the memory substrate this stands on) · prufrock (voice-fidelity checking, arrives when your voice rules are thick enough to grade against).

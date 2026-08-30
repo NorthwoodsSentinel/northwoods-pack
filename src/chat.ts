@@ -43,11 +43,20 @@ async function recallFor(env: Env, text: string): Promise<string> {
 }
 
 // Parse and persist [[SAVE:key=...]] / [[REMEMBER:...]] markers; return cleaned text.
+// MEMORY_WRITES=off (pilot mode): strip the markers but persist NOTHING — the pot stays
+// empty until the operator turns memory on deliberately. Existing installs leave the var
+// unset and keep full behavior; only a pilot deploy sets it off.
 export async function absorbMarkers(env: Env, reply: string): Promise<string> {
+  const memoryOff = String((env as any).MEMORY_WRITES ?? "").toLowerCase() === "off";
   const VALID = ["call_me", "who_i_am", "current_focus", "voice_rules", "anti_rules", "contract"];
   const now = Date.now();
   const stmts: D1PreparedStatement[] = [];
   let clean = reply;
+  if (memoryOff) {
+    // strip every marker, write nothing
+    clean = clean.replace(/\[\[SAVE:[a-z_]+=[\s\S]*?\]\]/g, "").replace(/\[\[REMEMBER:[\s\S]*?\]\]/g, "");
+    return clean.replace(/\n{3,}/g, "\n\n").trim();
+  }
   for (const m of reply.matchAll(/\[\[SAVE:([a-z_]+)=([\s\S]*?)\]\]/g)) {
     if (VALID.includes(m[1]) && m[2].trim()) {
       stmts.push(env.DB.prepare(
