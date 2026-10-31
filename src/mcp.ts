@@ -9,6 +9,7 @@
  * account; rotate by rotating DEMO_TOKEN. GET returns a human-readable hint.
  */
 import { Env, json, newId } from "./common";
+import { tokenMatches } from "./setup";
 import { getIdentityDoc } from "./identity";
 import { getLatestEntry } from "./substrate";
 
@@ -114,7 +115,7 @@ function textContent(text: string) {
 }
 
 export async function handleMcp(request: Request, env: Env, token: string): Promise<Response> {
-  if (!token || token !== env.DEMO_TOKEN) return json({ error: "Unauthorized" }, 401);
+  if (!(await tokenMatches(env, token))) return json({ error: "Unauthorized" }, 401);
   if (request.method === "GET")
     return json({
       mcp: "northwoods-pack",

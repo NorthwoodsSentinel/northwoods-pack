@@ -23,6 +23,27 @@ export function tokenIsDefault(env: Env): boolean {
   return !env.DEMO_TOKEN || env.DEMO_TOKEN === DEFAULT_TOKEN;
 }
 
+// kintsugi: the door was checked five ways by five hands, and two forgot the factory key;
+//   now one hand holds it, never opens to the default, and takes the same time for every wrong key.
+/**
+ * The one token check. Fails closed while the token is unset or still the
+ * factory default, and compares SHA-256 digests in constant time so response
+ * timing says nothing about how much of a guess was right.
+ */
+export async function tokenMatches(env: Env, presented: string | null | undefined): Promise<boolean> {
+  if (tokenIsDefault(env) || typeof presented !== "string" || presented.length === 0) return false;
+  const enc = new TextEncoder();
+  const [a, b] = await Promise.all([
+    crypto.subtle.digest("SHA-256", enc.encode(presented)),
+    crypto.subtle.digest("SHA-256", enc.encode(env.DEMO_TOKEN)),
+  ]);
+  const x = new Uint8Array(a);
+  const y = new Uint8Array(b);
+  let diff = 0;
+  for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
+  return diff === 0;
+}
+
 export const TOKEN_HELP =
   "This pot is still locked with the factory token, so it refuses to work, otherwise every install would share one public key. " +
   "Set your own: in your Cloudflare dashboard open this Worker → Settings → Variables and Secrets, replace DEMO_TOKEN with a long random string " +

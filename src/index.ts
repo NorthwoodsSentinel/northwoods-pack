@@ -37,7 +37,7 @@ import { handleAsk, handleOpen } from "./mycelia";
 import { handleIdentityGet, handleIdentityPut } from "./identity";
 import { handleIntakeForm, handleIntakeSubmit } from "./intake";
 import { handleMcp } from "./mcp";
-import { ensureSchema, tokenIsDefault, TOKEN_HELP } from "./setup";
+import { ensureSchema, tokenIsDefault, tokenMatches, TOKEN_HELP } from "./setup";
 import { handleChatPage, handleChatSend } from "./chat";
 import { handleConnectPage } from "./connect";
 
@@ -145,8 +145,9 @@ export default {
     // The door out: everything, as JSONL, gated by the token. Sovereignty that
     // can't leave isn't sovereignty. (Council catch, 2026-08-20.)
     if (method === "GET" && path === "/export") {
+      if (tokenIsDefault(env)) return json({ error: TOKEN_HELP }, 503);
       const t = url.searchParams.get("token") || request.headers.get("X-Pack-Token") || "";
-      if (!t || t !== env.DEMO_TOKEN) return unauthorized();
+      if (!(await tokenMatches(env, t))) return unauthorized();
       await ensureSchema(env);
       const idn = await env.DB.prepare("SELECT key, value, source, updated_at FROM identity_fields").all();
       const mem = await env.DB.prepare("SELECT * FROM substrate_entries ORDER BY created_at").all();
@@ -188,13 +189,22 @@ export default {
     }
     if (path.startsWith("/mcp/")) {
       if (tokenIsDefault(env)) return json({ error: TOKEN_HELP }, 503);
+      // The token is one percent-encoded path segment (the connect page and
+      // intake encode it), so decode it before comparing.
+      let mcpToken: string;
+      try {
+        mcpToken = decodeURIComponent(path.slice("/mcp/".length));
+      } catch {
+        return unauthorized();
+      }
       await ensureSchema(env);
-      return await handleMcp(request, env, path.slice("/mcp/".length));
+      return await handleMcp(request, env, mcpToken);
     }
 
     // Auth check for everything else
+    if (tokenIsDefault(env)) return json({ error: TOKEN_HELP }, 503);
     const token = request.headers.get("X-Pack-Token");
-    if (!token || token !== env.DEMO_TOKEN) {
+    if (!(await tokenMatches(env, token))) {
       return unauthorized();
     }
 

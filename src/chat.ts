@@ -13,6 +13,7 @@
  * parses out of the model's reply: [[SAVE:key=...]] / [[REMEMBER:...]], * stored server-side, stripped from the shown text. No client tooling needed.
  */
 import { Env, json, invalidJson, newId } from "./common";
+import { tokenMatches } from "./setup";
 import { getIdentityDoc } from "./identity";
 
 const MODEL = "@cf/meta/llama-4-scout-17b-16e-instruct";
@@ -83,7 +84,7 @@ export async function absorbMarkers(env: Env, reply: string): Promise<string> {
 export async function handleChatSend(request: Request, env: Env): Promise<Response> {
   let body: { token?: string; messages?: { role: string; content: string }[] };
   try { body = await request.json(); } catch { return invalidJson(); }
-  if (!body.token || body.token !== env.DEMO_TOKEN) return json({ error: "Bad token" }, 401);
+  if (!(await tokenMatches(env, body.token))) return json({ error: "Bad token" }, 401);
   const messages = (body.messages ?? []).slice(-16).filter(
     (m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string",
   );

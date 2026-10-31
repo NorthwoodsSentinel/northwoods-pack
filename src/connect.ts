@@ -51,9 +51,12 @@ export function handleConnectPage(): Response {
      token; the old URL dies instantly.</p>
   <script>
     const tok = document.getElementById('tok');
+    function encodeTokenSegment(s) {
+      return encodeURIComponent(s).replace(/[!'()*]/g, function (c) { return '%' + c.charCodeAt(0).toString(16).toUpperCase(); });
+    }
     function render() {
-      const t = tok.value.trim() || '<your-token>';
-      const url = location.origin + '/mcp/' + t;
+      const t = tok.value;
+      const url = location.origin + '/mcp/' + (t ? encodeTokenSegment(t) : '<your-token>');
       document.getElementById('cc').textContent = 'claude mcp add --transport http northwoods-pack ' + url;
       document.getElementById('web').textContent = url;
     }
