@@ -11,7 +11,8 @@
  * and a handful of things worth remembering, nothing clinical, nothing that
  * reads like a chart. The person describes themself in their own words.
  */
-import { Env, json, invalidJson, newId } from "./common";
+import { Env, encodeTokenSegment, json, invalidJson, newId } from "./common";
+import { tokenMatches } from "./setup";
 
 const QUESTIONS: Array<{ key: string; label: string; hint: string; rows: number }> = [
   { key: "call_me", label: "What should your AI call you?", hint: "A name, a handle, whatever feels right.", rows: 1 },
@@ -71,9 +72,12 @@ export function handleIntakeForm(): Response {
   </form>
   <div id="result"></div>
   <script>
+    function encodeTokenSegment(s) {
+      return encodeURIComponent(s).replace(/[!'()*]/g, function (c) { return '%' + c.charCodeAt(0).toString(16).toUpperCase(); });
+    }
     document.getElementById('token').addEventListener('input', (e) => {
-      const t = e.target.value.trim();
-      document.getElementById('mcpurl').textContent = t ? (location.origin + '/mcp/' + t) : '(type your token below to see your MCP URL)';
+      const t = e.target.value;
+      document.getElementById('mcpurl').textContent = t ? (location.origin + '/mcp/' + encodeTokenSegment(t)) : '(type your token below to see your MCP URL)';
     });
     document.getElementById('f').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -101,7 +105,7 @@ export async function handleIntakeSubmit(
   } catch {
     return invalidJson();
   }
-  if (!body.token || body.token !== env.DEMO_TOKEN)
+  if (!(await tokenMatches(env, body.token)))
     return json({ error: "Bad token, use the DEMO_TOKEN you set at deploy" }, 401);
 
   const now = Date.now();
@@ -139,7 +143,7 @@ export async function handleIntakeSubmit(
   return json({
     ok: true,
     seeded: { identity_fields: stmts.length - seeds.length * 2, memories: seeds.length },
-    mcp_url: `${origin}/mcp/${env.DEMO_TOKEN}`,
+    mcp_url: `${origin}/mcp/${encodeTokenSegment(env.DEMO_TOKEN)}`,
     next: "Paste the MCP URL into Claude (Settings → Connectors) or any MCP client. Your AI reads get_identity first.",
   });
 }

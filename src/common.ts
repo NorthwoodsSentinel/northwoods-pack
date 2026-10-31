@@ -37,6 +37,16 @@ export function invalidJson(): Response {
   return json({ error: "Invalid JSON" }, 400);
 }
 
+/**
+ * Encode the token as one MCP URL path segment (RFC 3986 strict): the result
+ * is only A-Z a-z 0-9 - _ . ~ and %XX, so it survives as a URL path segment
+ * and as an unquoted shell argument. The browser pages carry the same rule
+ * inline (encodeTokenSegment in connect.ts / intake.ts); keep them identical.
+ */
+export function encodeTokenSegment(token: string): string {
+  return encodeURIComponent(token).replace(/[!'()*]/g, (c) => "%" + c.charCodeAt(0).toString(16).toUpperCase());
+}
+
 export function newId(): string {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);

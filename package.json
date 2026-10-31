@@ -2,11 +2,12 @@
   "name": "northwoods-pack",
   "version": "0.2.0",
   "private": true,
-  "description": "Public PAI v0.1 modular monolith \u2014 5 capabilities in one Worker. First reference deployment in progress.",
+  "description": "Public PAI v0.1 modular monolith — 5 capabilities in one Worker. First reference deployment in progress.",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler d1 migrations apply DB --remote && node scripts/after-install.mjs",
-    "tail": "wrangler tail"
+    "tail": "wrangler tail",
+    "test": "bun test"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260501.0",

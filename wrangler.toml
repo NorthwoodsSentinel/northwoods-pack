@@ -7,7 +7,8 @@ compatibility_date = "2026-05-01"
 # Deploy to your own Cloudflare account: https://deploy.workers.cloudflare.com/?url=https://github.com/NorthwoodsSentinel/northwoods-pack
 
 [vars]
-# Change this BEFORE going to production. Generate a fresh token: openssl rand -hex 32
+# No plain vars. DEMO_TOKEN is a secret: the Deploy button asks for it (see .dev.vars.example),
+# or set it with `bunx wrangler secret put DEMO_TOKEN`. The worker refuses to run without it.
 
 # D1 — Cloudflare will create one for you on Deploy Button install. After deploy, run:
 #   wrangler d1 execute northwoods-substrate --remote --file=migrations/0001_init.sql
