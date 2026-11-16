@@ -5,7 +5,7 @@
  * v0.2 is a structural stub: endpoints exist, contract enforced, no cross-fleet wiring yet.
  */
 
-import { json, Env } from "./common";
+import { json } from "./common";
 
 interface AskRequest {
   question: string;
@@ -18,8 +18,7 @@ function requireOptIn(request: Request): Response | null {
     return json(
       {
         error: "Opt-in required",
-        note:
-          "Mycelia is off by default. Send header 'X-Mycelia-Opt-In: true' with each request. v0.3 may add persistent opt-in.",
+        note: "Mycelia is off by default. Send header 'X-Mycelia-Opt-In: true' with each request. v0.3 may add persistent opt-in.",
       },
       403,
     );
@@ -27,10 +26,7 @@ function requireOptIn(request: Request): Response | null {
   return null;
 }
 
-export async function handleAsk(
-  request: Request,
-  _env: Env,
-): Promise<Response> {
+export async function handleAsk(request: Request): Promise<Response> {
   const opt = requireOptIn(request);
   if (opt) return opt;
 
@@ -47,16 +43,12 @@ export async function handleAsk(
 
   return json({
     acknowledged: true,
-    note:
-      "v0.2 stub, your question was received but the cross-fleet wiring isn't built yet. Coming in v0.3.",
+    note: "v0.2 stub, your question was received but the cross-fleet wiring isn't built yet. Coming in v0.3.",
     received: { question: body.question, context: body.context ?? null },
   });
 }
 
-export async function handleOpen(
-  request: Request,
-  _env: Env,
-): Promise<Response> {
+export async function handleOpen(request: Request): Promise<Response> {
   const opt = requireOptIn(request);
   if (opt) return opt;
 

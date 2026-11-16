@@ -30,8 +30,16 @@ export function tokenIsDefault(env: Env): boolean {
  * factory default, and compares SHA-256 digests in constant time so response
  * timing says nothing about how much of a guess was right.
  */
-export async function tokenMatches(env: Env, presented: string | null | undefined): Promise<boolean> {
-  if (tokenIsDefault(env) || typeof presented !== "string" || presented.length === 0) return false;
+export async function tokenMatches(
+  env: Env,
+  presented: string | null | undefined,
+): Promise<boolean> {
+  if (
+    tokenIsDefault(env) ||
+    typeof presented !== "string" ||
+    presented.length === 0
+  )
+    return false;
   const enc = new TextEncoder();
   const [a, b] = await Promise.all([
     crypto.subtle.digest("SHA-256", enc.encode(presented)),

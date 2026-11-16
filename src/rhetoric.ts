@@ -10,7 +10,7 @@
  * The AI greets the user as a person; this module shapes what reaches them.
  */
 
-import { json, Env } from "./common";
+import { json } from "./common";
 
 interface TransformRequest {
   text: string;
@@ -65,7 +65,10 @@ function splitLongSentences(text: string): {
       const parts = s.split(/\s*(?:;|, |–| - )\s*/);
       if (parts.length > 1) {
         changed = true;
-        return parts.map((p) => p.trim()).filter(Boolean).join(". ");
+        return parts
+          .map((p) => p.trim())
+          .filter(Boolean)
+          .join(". ");
       }
       // coordinating conjunctions only (and/but/so), capitalize new sentence
       const cc = s.split(/,\s+(?:and|but|so)\s+/);
@@ -110,10 +113,7 @@ function collapseBlankLines(text: string): { text: string; changed: boolean } {
   return { text: text.replace(/\n{3,}/g, "\n\n"), changed: true };
 }
 
-export async function handleTransform(
-  request: Request,
-  _env: Env,
-): Promise<Response> {
+export async function handleTransform(request: Request): Promise<Response> {
   let body: TransformRequest;
   try {
     body = (await request.json()) as TransformRequest;

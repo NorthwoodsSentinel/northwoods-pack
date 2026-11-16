@@ -1,0 +1,14 @@
+# Generated, vendored or lock output is never a format target.
+node_modules/
+.wrangler/
+dist/
+build/
+coverage/
+.scratch/
+bun.lock
+gate/package-lock.json
+# Prose is left as written: the README, doctrine and skill files are read by people and
+# by other people's AIs, and reflowing them is not a formatting fix.
+*.md
+# The Deploy button runs this file on every install; it stays byte-for-byte as shipped.
+scripts/after-install.mjs

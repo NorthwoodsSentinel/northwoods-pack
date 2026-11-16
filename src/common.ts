@@ -7,6 +7,8 @@ export interface Env {
   DB: D1Database;
   PREFS: KVNamespace;
   AI: Ai;
+  // Optional plain var: "off" runs pilot mode (memory writes acknowledged, nothing stored).
+  MEMORY_WRITES?: string;
 }
 
 export function corsHeaders(): HeadersInit {
@@ -44,7 +46,10 @@ export function invalidJson(): Response {
  * inline (encodeTokenSegment in connect.ts / intake.ts); keep them identical.
  */
 export function encodeTokenSegment(token: string): string {
-  return encodeURIComponent(token).replace(/[!'()*]/g, (c) => "%" + c.charCodeAt(0).toString(16).toUpperCase());
+  return encodeURIComponent(token).replace(
+    /[!'()*]/g,
+    (c) => "%" + c.charCodeAt(0).toString(16).toUpperCase(),
+  );
 }
 
 export function newId(): string {

@@ -1,0 +1,11 @@
+// Typecheck of the tests and gate tooling: src/ plus tests/ plus this folder's configs,
+// with Node and Vitest-globals types. skipLibCheck because the Workers and Node global
+// declarations collide (the root tsconfig sets it too).
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["@cloudflare/workers-types", "node", "vitest/globals"],
+    "skipLibCheck": true
+  },
+  "include": ["../src/**/*.ts", "../tests/**/*.ts", "./*.mts", "./*.ts"]
+}
