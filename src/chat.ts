@@ -24,23 +24,41 @@ function systemPrompt(identity: string | null, recalled: string): string {
   const parts: string[] = [
     "You are this person's harness, their own AI, running on their own account. Plain prose. One thing at a time. Never present option-menus unless offering examples to react to. Never mention how long since they last spoke. A correction is an instruction: obey it and, if durable, emit [[REMEMBER:...]] or [[SAVE:voice_rules=...]] per the marker rules.",
   ];
-  if (identity) parts.push("WHO YOU ARE TALKING TO (read carefully, obey the contract):\n" + identity);
+  if (identity)
+    parts.push(
+      "WHO YOU ARE TALKING TO (read carefully, obey the contract):\n" +
+        identity,
+    );
   else parts.push(INTERVIEWER);
-  if (recalled) parts.push("POSSIBLY RELEVANT MEMORIES (use silently; cite only if useful):\n" + recalled);
+  if (recalled)
+    parts.push(
+      "POSSIBLY RELEVANT MEMORIES (use silently; cite only if useful):\n" +
+        recalled,
+    );
   return parts.join("\n\n");
 }
 
 async function recallFor(env: Env, text: string): Promise<string> {
-  const terms = text.toLowerCase().split(/[^a-z0-9']+/).filter((t) => t.length >= 4).slice(0, 6);
+  const terms = text
+    .toLowerCase()
+    .split(/[^a-z0-9']+/)
+    .filter((t) => t.length >= 4)
+    .slice(0, 6);
   if (!terms.length) return "";
   try {
     const q = terms.map((t) => `"${t}"`).join(" OR ");
     const rows = await env.DB.prepare(
       `SELECT e.type, e.body FROM entries_fts f JOIN substrate_entries e ON e.id = f.entry_id
        WHERE entries_fts MATCH ? AND e.sensitivity != 'secret' ORDER BY e.created_at DESC LIMIT 6`,
-    ).bind(q).all<{ type: string; body: string }>();
-    return (rows.results ?? []).map((r) => `- [${r.type}] ${r.body}`).join("\n");
-  } catch { return ""; }
+    )
+      .bind(q)
+      .all<{ type: string; body: string }>();
+    return (rows.results ?? [])
+      .map((r) => `- [${r.type}] ${r.body}`)
+      .join("\n");
+  } catch {
+    return "";
+  }
 }
 
 // Parse and persist [[SAVE:key=...]] / [[REMEMBER:...]] markers; return cleaned text.
@@ -48,32 +66,49 @@ async function recallFor(env: Env, text: string): Promise<string> {
 // empty until the operator turns memory on deliberately. Existing installs leave the var
 // unset and keep full behavior; only a pilot deploy sets it off.
 export async function absorbMarkers(env: Env, reply: string): Promise<string> {
-  const memoryOff = String((env as any).MEMORY_WRITES ?? "").toLowerCase() === "off";
-  const VALID = ["call_me", "who_i_am", "current_focus", "voice_rules", "anti_rules", "contract"];
+  const memoryOff = String(env.MEMORY_WRITES ?? "").toLowerCase() === "off";
+  const VALID = [
+    "call_me",
+    "who_i_am",
+    "current_focus",
+    "voice_rules",
+    "anti_rules",
+    "contract",
+  ];
   const now = Date.now();
   const stmts: D1PreparedStatement[] = [];
   let clean = reply;
   if (memoryOff) {
     // strip every marker, write nothing
-    clean = clean.replace(/\[\[SAVE:[a-z_]+=[\s\S]*?\]\]/g, "").replace(/\[\[REMEMBER:[\s\S]*?\]\]/g, "");
+    clean = clean
+      .replace(/\[\[SAVE:[a-z_]+=[\s\S]*?\]\]/g, "")
+      .replace(/\[\[REMEMBER:[\s\S]*?\]\]/g, "");
     return clean.replace(/\n{3,}/g, "\n\n").trim();
   }
   for (const m of reply.matchAll(/\[\[SAVE:([a-z_]+)=([\s\S]*?)\]\]/g)) {
     if (VALID.includes(m[1]) && m[2].trim()) {
-      stmts.push(env.DB.prepare(
-        "INSERT INTO identity_fields (key, value, source, updated_at) VALUES (?, ?, 'chat-interview', ?) " +
-        "ON CONFLICT(key) DO UPDATE SET value = excluded.value, source = 'chat-interview', updated_at = excluded.updated_at",
-      ).bind(m[1], m[2].trim(), now));
+      stmts.push(
+        env.DB.prepare(
+          "INSERT INTO identity_fields (key, value, source, updated_at) VALUES (?, ?, 'chat-interview', ?) " +
+            "ON CONFLICT(key) DO UPDATE SET value = excluded.value, source = 'chat-interview', updated_at = excluded.updated_at",
+        ).bind(m[1], m[2].trim(), now),
+      );
     }
     clean = clean.replace(m[0], "");
   }
   for (const m of reply.matchAll(/\[\[REMEMBER:([\s\S]*?)\]\]/g)) {
     if (m[1].trim()) {
       const id = newId();
-      stmts.push(env.DB.prepare(
-        "INSERT INTO substrate_entries (id, type, body, tags_json, created_at, updated_at, source, trust_level, sensitivity) VALUES (?, 'context', ?, '[\"chat\"]', ?, ?, 'chat', 'mixed', 'personal')",
-      ).bind(id, m[1].trim(), now, now));
-      stmts.push(env.DB.prepare("INSERT INTO entries_fts (body, entry_id, type) VALUES (?, ?, 'context')").bind(m[1].trim(), id));
+      stmts.push(
+        env.DB.prepare(
+          "INSERT INTO substrate_entries (id, type, body, tags_json, created_at, updated_at, source, trust_level, sensitivity) VALUES (?, 'context', ?, '[\"chat\"]', ?, ?, 'chat', 'mixed', 'personal')",
+        ).bind(id, m[1].trim(), now, now),
+      );
+      stmts.push(
+        env.DB.prepare(
+          "INSERT INTO entries_fts (body, entry_id, type) VALUES (?, ?, 'context')",
+        ).bind(m[1].trim(), id),
+      );
     }
     clean = clean.replace(m[0], "");
   }
@@ -81,26 +116,52 @@ export async function absorbMarkers(env: Env, reply: string): Promise<string> {
   return clean.replace(/\n{3,}/g, "\n\n").trim();
 }
 
-export async function handleChatSend(request: Request, env: Env): Promise<Response> {
+export async function handleChatSend(
+  request: Request,
+  env: Env,
+): Promise<Response> {
   let body: { token?: string; messages?: { role: string; content: string }[] };
-  try { body = await request.json(); } catch { return invalidJson(); }
-  if (!(await tokenMatches(env, body.token))) return json({ error: "Bad token" }, 401);
-  const messages = (body.messages ?? []).slice(-16).filter(
-    (m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string",
-  );
+  try {
+    body = await request.json();
+  } catch {
+    return invalidJson();
+  }
+  if (!(await tokenMatches(env, body.token)))
+    return json({ error: "Bad token" }, 401);
+  const messages = (body.messages ?? [])
+    .slice(-16)
+    .filter(
+      (m) =>
+        (m.role === "user" || m.role === "assistant") &&
+        typeof m.content === "string",
+    );
   if (!messages.length) return json({ error: "No messages" }, 400);
 
   const identity = await getIdentityDoc(env);
-  const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+  const lastUser =
+    [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
   const recalled = identity ? await recallFor(env, lastUser) : "";
   const sys = systemPrompt(identity, recalled);
 
-  const ai: any = await env.AI.run(MODEL as any, {
-    messages: [{ role: "system", content: sys }, ...messages],
-    max_tokens: 800,
-  } as any);
+  const ai = (await env.AI.run(
+    MODEL as keyof AiModels,
+    {
+      messages: [{ role: "system", content: sys }, ...messages],
+      max_tokens: 800,
+    } as never,
+  )) as {
+    response?: string;
+    choices?: { message?: { content?: string } }[];
+  } | null;
   const raw: string = ai?.response ?? ai?.choices?.[0]?.message?.content ?? "";
-  if (!raw) return json({ error: "The model returned nothing. Workers AI may be at its daily free allocation." }, 502);
+  if (!raw)
+    return json(
+      {
+        error:
+          "The model returned nothing. Workers AI may be at its daily free allocation.",
+      },
+      502,
+    );
   const reply = await absorbMarkers(env, raw);
   return json({ reply });
 }
@@ -174,5 +235,7 @@ export function handleChatPage(): Response {
     if (TOKEN) enter();
   </script>
 </body></html>`;
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  return new Response(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
 }

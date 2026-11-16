@@ -67,5 +67,7 @@ export function handleConnectPage(): Response {
     }));
   </script>
 </body></html>`;
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  return new Response(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
 }

@@ -8,3 +8,5 @@ node_modules/
 dist/
 build/
 wrangler.ref.toml
+coverage/
+.scratch/

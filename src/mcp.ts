@@ -20,7 +20,11 @@ const TOOLS = [
     name: "get_identity",
     description:
       "Read who this person is, what they're working toward, and how they want to be spoken to. Call this FIRST in any new conversation.",
-    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
   },
   {
     name: "set_identity",
@@ -29,8 +33,15 @@ const TOOLS = [
     inputSchema: {
       type: "object",
       properties: {
-        key: { type: "string", description: "call_me | who_i_am | current_focus | voice_rules | anti_rules | contract" },
-        value: { type: "string", description: "the approved text, in the person's own words" },
+        key: {
+          type: "string",
+          description:
+            "call_me | who_i_am | current_focus | voice_rules | anti_rules | contract",
+        },
+        value: {
+          type: "string",
+          description: "the approved text, in the person's own words",
+        },
       },
       required: ["key", "value"],
       additionalProperties: false,
@@ -42,7 +53,9 @@ const TOOLS = [
       "Search this person's memory store. Use plain keywords from the current topic.",
     inputSchema: {
       type: "object",
-      properties: { query: { type: "string", description: "keywords to search" } },
+      properties: {
+        query: { type: "string", description: "keywords to search" },
+      },
       required: ["query"],
       additionalProperties: false,
     },
@@ -51,7 +64,11 @@ const TOOLS = [
     name: "where_was_i",
     description:
       "When the person returns, after an hour or a month, call this for one forward-leaning sentence to restart momentum. NEVER compute or mention how long they were gone; absence carries no debt here.",
-    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
   },
   {
     name: "hold_this",
@@ -59,7 +76,12 @@ const TOOLS = [
       "When the person has to stop, or names something they can't hold right now, park it on their shelf. Confirm it's held; never add urgency or a deadline.",
     inputSchema: {
       type: "object",
-      properties: { body: { type: "string", description: "the thread to hold, in their words" } },
+      properties: {
+        body: {
+          type: "string",
+          description: "the thread to hold, in their words",
+        },
+      },
       required: ["body"],
       additionalProperties: false,
     },
@@ -70,7 +92,12 @@ const TOOLS = [
       "When the person asks what's on their shelf or what they left open, return ONE held thread, the harness never presents menus. They can ask again for the next, mark it done, or release it.",
     inputSchema: {
       type: "object",
-      properties: { action: { type: "string", description: "next (default) | done:<id> | release:<id>" } },
+      properties: {
+        action: {
+          type: "string",
+          description: "next (default) | done:<id> | release:<id>",
+        },
+      },
       additionalProperties: false,
     },
   },
@@ -81,8 +108,15 @@ const TOOLS = [
     inputSchema: {
       type: "object",
       properties: {
-        rule: { type: "string", description: "the correction, as a standing rule in the person's own terms" },
-        kind: { type: "string", description: "voice (how to speak) | anti (never do this)" },
+        rule: {
+          type: "string",
+          description:
+            "the correction, as a standing rule in the person's own terms",
+        },
+        kind: {
+          type: "string",
+          description: "voice (how to speak) | anti (never do this)",
+        },
       },
       required: ["rule"],
       additionalProperties: false,
@@ -95,8 +129,14 @@ const TOOLS = [
     inputSchema: {
       type: "object",
       properties: {
-        body: { type: "string", description: "the memory, one to three sentences" },
-        type: { type: "string", description: "fact | decision | context | preference" },
+        body: {
+          type: "string",
+          description: "the memory, one to three sentences",
+        },
+        type: {
+          type: "string",
+          description: "fact | decision | context | preference",
+        },
       },
       required: ["body"],
       additionalProperties: false,
@@ -114,8 +154,13 @@ function textContent(text: string) {
   return { content: [{ type: "text", text }] };
 }
 
-export async function handleMcp(request: Request, env: Env, token: string): Promise<Response> {
-  if (!(await tokenMatches(env, token))) return json({ error: "Unauthorized" }, 401);
+export async function handleMcp(
+  request: Request,
+  env: Env,
+  token: string,
+): Promise<Response> {
+  if (!(await tokenMatches(env, token)))
+    return json({ error: "Unauthorized" }, 401);
   if (request.method === "GET")
     return json({
       mcp: "northwoods-pack",
@@ -123,7 +168,12 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
       hint: "POST JSON-RPC here. Tools: get_identity, recall_memories, remember, correct_me.",
     });
 
-  let msg: { jsonrpc?: string; id?: unknown; method?: string; params?: any };
+  let msg: {
+    jsonrpc?: string;
+    id?: unknown;
+    method?: string;
+    params?: { name?: unknown; arguments?: Record<string, unknown> };
+  };
   try {
     msg = await request.json();
   } catch {
@@ -137,7 +187,8 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
       capabilities: { tools: {} },
       serverInfo: { name: "northwoods-pack", version: "0.5.0" },
     });
-  if (method === "notifications/initialized") return new Response(null, { status: 202 });
+  if (method === "notifications/initialized")
+    return new Response(null, { status: 202 });
   if (method === "ping") return rpcResult(id, {});
   if (method === "tools/list") return rpcResult(id, { tools: TOOLS });
 
@@ -147,10 +198,20 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
     try {
       // MEMORY_WRITES=off (pilot mode): the writing tools acknowledge but persist NOTHING.
       // Reads (get_identity, recall_memories, where_was_i, whats_open) stay live.
-      const memoryOff = String((env as any).MEMORY_WRITES ?? "").toLowerCase() === "off";
-      const WRITE_TOOLS = ["set_identity", "correct_me", "remember", "hold_this"];
+      const memoryOff = String(env.MEMORY_WRITES ?? "").toLowerCase() === "off";
+      const WRITE_TOOLS = [
+        "set_identity",
+        "correct_me",
+        "remember",
+        "hold_this",
+      ];
       if (memoryOff && WRITE_TOOLS.includes(String(name))) {
-        return rpcResult(id, textContent("Noted for this conversation. (Long-term memory is off during the pilot — nothing was saved.)"));
+        return rpcResult(
+          id,
+          textContent(
+            "Noted for this conversation. (Long-term memory is off during the pilot — nothing was saved.)",
+          ),
+        );
       }
       if (name === "get_identity") {
         const doc = await getIdentityDoc(env);
@@ -159,24 +220,38 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
         // cohort burns energy on. A conversation with drafts to approve doesn't.
         return rpcResult(
           id,
-          textContent(doc ?? [
-            "This pot is empty, and YOU are the intake. Interview the person you're talking to, gently, ONE question at a time, in this order:",
-            "1. What should I call you?  (store key: call_me)",
-            "2. Who are you?, let them ramble; offer to draft it FROM the ramble rather than asking for a clean answer.  (key: who_i_am)",
-            "3. What are you building or chasing right now?  (key: current_focus)",
-            "4. How should an AI speak to you?, offer concrete options to react to (direct? short? no pep talks? no option-lists?); recognition beats articulation.  (key: voice_rules)",
-            "5. What should an AI NEVER do with you?, again, offer examples: cheerleading, hedging, lectures, time pressure.  (key: anti_rules)",
-            "6. EVIDENCE BEATS DESCRIPTION, invite them to SHOW you instead of telling you: a photo of their bookshelf, their desk, their workbench, anything they live with. Describe what you actually see, guess gently at what it says about them, and let them correct you. Store each CONFIRMED observation with remember (type: context).",
-            "7. Ask for a piece of writing they made themselves, without AI, an old email, a journal scrap, a post. Store it verbatim with remember (type: voice_sample), it is the seed their voice gets checked against later, and offer to draft who_i_am FROM their own words rather than asking them to produce a self-description cold.",
-            "RULES: one question per turn, never a form. After each answer, DRAFT the field in their words, read it back, and only call set_identity after they approve. If they correct you, that IS the data. Anything worth keeping beyond identity goes in remember.",
-          ].join("\n")),
+          textContent(
+            doc ??
+              [
+                "This pot is empty, and YOU are the intake. Interview the person you're talking to, gently, ONE question at a time, in this order:",
+                "1. What should I call you?  (store key: call_me)",
+                "2. Who are you?, let them ramble; offer to draft it FROM the ramble rather than asking for a clean answer.  (key: who_i_am)",
+                "3. What are you building or chasing right now?  (key: current_focus)",
+                "4. How should an AI speak to you?, offer concrete options to react to (direct? short? no pep talks? no option-lists?); recognition beats articulation.  (key: voice_rules)",
+                "5. What should an AI NEVER do with you?, again, offer examples: cheerleading, hedging, lectures, time pressure.  (key: anti_rules)",
+                "6. EVIDENCE BEATS DESCRIPTION, invite them to SHOW you instead of telling you: a photo of their bookshelf, their desk, their workbench, anything they live with. Describe what you actually see, guess gently at what it says about them, and let them correct you. Store each CONFIRMED observation with remember (type: context).",
+                "7. Ask for a piece of writing they made themselves, without AI, an old email, a journal scrap, a post. Store it verbatim with remember (type: voice_sample), it is the seed their voice gets checked against later, and offer to draft who_i_am FROM their own words rather than asking them to produce a self-description cold.",
+                "RULES: one question per turn, never a form. After each answer, DRAFT the field in their words, read it back, and only call set_identity after they approve. If they correct you, that IS the data. Anything worth keeping beyond identity goes in remember.",
+              ].join("\n"),
+          ),
         );
       }
       if (name === "set_identity") {
         const key = String(args.key ?? "").trim();
         const value = String(args.value ?? "").trim();
-        const VALID = ["call_me", "who_i_am", "current_focus", "voice_rules", "anti_rules", "contract"];
-        if (!VALID.includes(key)) return rpcResult(id, textContent(`key must be one of: ${VALID.join(", ")}`));
+        const VALID = [
+          "call_me",
+          "who_i_am",
+          "current_focus",
+          "voice_rules",
+          "anti_rules",
+          "contract",
+        ];
+        if (!VALID.includes(key))
+          return rpcResult(
+            id,
+            textContent(`key must be one of: ${VALID.join(", ")}`),
+          );
         if (!value) return rpcResult(id, textContent("Empty value."));
         await env.DB.prepare(
           "INSERT INTO identity_fields (key, value, source, updated_at) VALUES (?, ?, 'interview-via-ai', ?) " +
@@ -184,7 +259,12 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
         )
           .bind(key, value, Date.now())
           .run();
-        return rpcResult(id, textContent(`Stored ${key}. Read the full identity back with get_identity when the interview feels done.`));
+        return rpcResult(
+          id,
+          textContent(
+            `Stored ${key}. Read the full identity back with get_identity when the interview feels done.`,
+          ),
+        );
       }
       if (name === "recall_memories") {
         const q = String(args.query ?? "").trim();
@@ -192,7 +272,11 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
         // loam's search layer: FTS5 match, then provenance join. Recall excludes
         // sensitivity='secret' by default, the egress rule is bound at the query,
         // not left as advice (tag now, enforce here).
-        const ftsQuery = q.split(/\s+/).slice(0, 6).map((t) => `"${t.replace(/"/g, "")}"`).join(" OR ");
+        const ftsQuery = q
+          .split(/\s+/)
+          .slice(0, 6)
+          .map((t) => `"${t.replace(/"/g, "")}"`)
+          .join(" OR ");
         const rows = await env.DB.prepare(
           `SELECT e.type, e.body, e.source, e.trust_level FROM entries_fts f
            JOIN substrate_entries e ON e.id = f.entry_id
@@ -200,20 +284,34 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
            ORDER BY e.created_at DESC LIMIT 12`,
         )
           .bind(ftsQuery)
-          .all<{ type: string; body: string; source: string; trust_level: string }>();
+          .all<{
+            type: string;
+            body: string;
+            source: string;
+            trust_level: string;
+          }>();
         const hits = rows.results ?? [];
         return rpcResult(
           id,
           textContent(
             hits.length
-              ? hits.map((h) => `[${h.type} · ${h.source} · ${h.trust_level}] ${h.body}`).join("\n")
+              ? hits
+                  .map(
+                    (h) =>
+                      `[${h.type} · ${h.source} · ${h.trust_level}] ${h.body}`,
+                  )
+                  .join("\n")
               : "No matching memories.",
           ),
         );
       }
       if (name === "where_was_i") {
         const latest = await getLatestEntry(env);
-        const snippet = latest ? (latest.body.length > 140 ? latest.body.slice(0, 137).trimEnd() + "..." : latest.body) : null;
+        const snippet = latest
+          ? latest.body.length > 140
+            ? latest.body.slice(0, 137).trimEnd() + "..."
+            : latest.body
+          : null;
         const loop = await env.DB.prepare(
           "SELECT body FROM loops WHERE status='open' ORDER BY created_at DESC LIMIT 1",
         ).first<{ body: string }>();
@@ -234,27 +332,45 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
         )
           .bind(newId(), body, Date.now())
           .run();
-        return rpcResult(id, textContent("Held. It's on your shelf, not in your head. Nothing about it will nag you."));
+        return rpcResult(
+          id,
+          textContent(
+            "Held. It's on your shelf, not in your head. Nothing about it will nag you.",
+          ),
+        );
       }
       if (name === "whats_open") {
         const action = String(args.action ?? "next").trim();
         const m = action.match(/^(done|release):(\w+)$/);
         if (m) {
-          await env.DB.prepare("UPDATE loops SET status=?, closed_at=? WHERE id=?")
+          await env.DB.prepare(
+            "UPDATE loops SET status=?, closed_at=? WHERE id=?",
+          )
             .bind(m[1] === "done" ? "done" : "released", Date.now(), m[2])
             .run();
-          return rpcResult(id, textContent(m[1] === "done" ? "Closed. Good." : "Released, off the shelf, no ceremony."));
+          return rpcResult(
+            id,
+            textContent(
+              m[1] === "done"
+                ? "Closed. Good."
+                : "Released, off the shelf, no ceremony.",
+            ),
+          );
         }
         // ONE loop at a time, a menu is how threads die and the person becomes
         // the continuity. Oldest first, so nothing quietly rots at the bottom.
         const row = await env.DB.prepare(
           "SELECT id, body FROM loops WHERE status='open' ORDER BY created_at ASC LIMIT 1",
         ).first<{ id: string; body: string }>();
-        const count = await env.DB.prepare("SELECT COUNT(*) as n FROM loops WHERE status='open'").first<{ n: number }>();
+        const count = await env.DB.prepare(
+          "SELECT COUNT(*) as n FROM loops WHERE status='open'",
+        ).first<{ n: number }>();
         if (!row) return rpcResult(id, textContent("The shelf is clear."));
         return rpcResult(
           id,
-          textContent(`One thing, oldest first (${count?.n ?? 1} held in total): ${row.body}\n(mark it: done:${row.id} · release:${row.id} · or ask again for the next)`),
+          textContent(
+            `One thing, oldest first (${count?.n ?? 1} held in total): ${row.body}\n(mark it: done:${row.id} · release:${row.id} · or ask again for the next)`,
+          ),
         );
       }
       if (name === "correct_me") {
@@ -262,7 +378,9 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
         if (!rule) return rpcResult(id, textContent("Empty correction."));
         const key = args.kind === "anti" ? "anti_rules" : "voice_rules";
         const now = Date.now();
-        const prior = await env.DB.prepare("SELECT value FROM identity_fields WHERE key = ?")
+        const prior = await env.DB.prepare(
+          "SELECT value FROM identity_fields WHERE key = ?",
+        )
           .bind(key)
           .first<{ value: string }>();
         const value = prior?.value ? `${prior.value}\n- ${rule}` : `- ${rule}`;
@@ -272,13 +390,20 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
         )
           .bind(key, value, now)
           .run();
-        return rpcResult(id, textContent(`Correction stored as a standing ${key === "anti_rules" ? "never-rule" : "voice rule"}. It survives this conversation.`));
+        return rpcResult(
+          id,
+          textContent(
+            `Correction stored as a standing ${key === "anti_rules" ? "never-rule" : "voice rule"}. It survives this conversation.`,
+          ),
+        );
       }
       if (name === "remember") {
         const body = String(args.body ?? "").trim();
         if (!body) return rpcResult(id, textContent("Nothing to store."));
-        const type = ["fact", "decision", "context", "preference"].includes(args.type)
-          ? args.type
+        const type = ["fact", "decision", "context", "preference"].includes(
+          args.type as string,
+        )
+          ? (args.type as string)
           : "fact";
         const now = Date.now();
         const mid = newId();
@@ -288,9 +413,14 @@ export async function handleMcp(request: Request, env: Env, token: string): Prom
           env.DB.prepare(
             "INSERT INTO substrate_entries (id, type, body, tags_json, created_at, updated_at, source, trust_level, sensitivity) VALUES (?, ?, ?, '[\"mcp\"]', ?, ?, 'mcp', 'mixed', 'personal')",
           ).bind(mid, type, body, now, now),
-          env.DB.prepare("INSERT INTO entries_fts (body, entry_id, type) VALUES (?, ?, ?)").bind(body, mid, type),
+          env.DB.prepare(
+            "INSERT INTO entries_fts (body, entry_id, type) VALUES (?, ?, ?)",
+          ).bind(body, mid, type),
         ]);
-        return rpcResult(id, textContent(`Stored (${type}, provenance: mcp/mixed).`));
+        return rpcResult(
+          id,
+          textContent(`Stored (${type}, provenance: mcp/mixed).`),
+        );
       }
       return rpcError(id, -32602, `Unknown tool: ${name}`);
     } catch (err) {

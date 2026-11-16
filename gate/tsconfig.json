@@ -1,0 +1,10 @@
+// Typecheck of src/ exactly as the root tsconfig.json describes it (the file wrangler
+// reads at deploy, left untouched), resolved against this folder's node_modules so the
+// gate never needs the root install.
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "typeRoots": ["./node_modules/@types", "./node_modules"]
+  },
+  "include": ["../src/**/*.ts"]
+}

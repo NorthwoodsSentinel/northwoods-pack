@@ -14,12 +14,42 @@
 import { Env, encodeTokenSegment, json, invalidJson, newId } from "./common";
 import { tokenMatches } from "./setup";
 
-const QUESTIONS: Array<{ key: string; label: string; hint: string; rows: number }> = [
-  { key: "call_me", label: "What should your AI call you?", hint: "A name, a handle, whatever feels right.", rows: 1 },
-  { key: "who_i_am", label: "Who are you, in your own words?", hint: "A few sentences. Not a resume, how you'd tell a new friend.", rows: 4 },
-  { key: "current_focus", label: "What are you building or chasing right now?", hint: "The thing you'd want your AI to hold steady across every conversation.", rows: 3 },
-  { key: "voice_rules", label: "How should an AI speak to you?", hint: "Direct? Short? No pep talks? Explain like a colleague? Your rules.", rows: 3 },
-  { key: "anti_rules", label: "What should an AI never do with you?", hint: "The stuff that makes you close the tab. Cheerleading, hedging, lectures, name it.", rows: 3 },
+const QUESTIONS: Array<{
+  key: string;
+  label: string;
+  hint: string;
+  rows: number;
+}> = [
+  {
+    key: "call_me",
+    label: "What should your AI call you?",
+    hint: "A name, a handle, whatever feels right.",
+    rows: 1,
+  },
+  {
+    key: "who_i_am",
+    label: "Who are you, in your own words?",
+    hint: "A few sentences. Not a resume, how you'd tell a new friend.",
+    rows: 4,
+  },
+  {
+    key: "current_focus",
+    label: "What are you building or chasing right now?",
+    hint: "The thing you'd want your AI to hold steady across every conversation.",
+    rows: 3,
+  },
+  {
+    key: "voice_rules",
+    label: "How should an AI speak to you?",
+    hint: "Direct? Short? No pep talks? Explain like a colleague? Your rules.",
+    rows: 3,
+  },
+  {
+    key: "anti_rules",
+    label: "What should an AI never do with you?",
+    hint: "The stuff that makes you close the tab. Cheerleading, hedging, lectures, name it.",
+    rows: 3,
+  },
 ];
 
 export function handleIntakeForm(): Response {
@@ -27,9 +57,11 @@ export function handleIntakeForm(): Response {
     (q) => `
       <label for="${q.key}">${q.label}</label>
       <p class="hint">${q.hint}</p>
-      ${q.rows === 1
-        ? `<input id="${q.key}" name="${q.key}" type="text" />`
-        : `<textarea id="${q.key}" name="${q.key}" rows="${q.rows}"></textarea>`}
+      ${
+        q.rows === 1
+          ? `<input id="${q.key}" name="${q.key}" type="text" />`
+          : `<textarea id="${q.key}" name="${q.key}" rows="${q.rows}"></textarea>`
+      }
     `,
   ).join("\n");
   const html = `<!doctype html>
@@ -92,7 +124,9 @@ export function handleIntakeForm(): Response {
     });
   </script>
 </body></html>`;
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  return new Response(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
 }
 
 export async function handleIntakeSubmit(
@@ -106,7 +140,10 @@ export async function handleIntakeSubmit(
     return invalidJson();
   }
   if (!(await tokenMatches(env, body.token)))
-    return json({ error: "Bad token, use the DEMO_TOKEN you set at deploy" }, 401);
+    return json(
+      { error: "Bad token, use the DEMO_TOKEN you set at deploy" },
+      401,
+    );
 
   const now = Date.now();
   const stmts = [];
@@ -133,7 +170,9 @@ export async function handleIntakeSubmit(
       ).bind(sid, s, now, now),
     );
     stmts.push(
-      env.DB.prepare("INSERT INTO entries_fts (body, entry_id, type) VALUES (?, ?, 'seed')").bind(s, sid),
+      env.DB.prepare(
+        "INSERT INTO entries_fts (body, entry_id, type) VALUES (?, ?, 'seed')",
+      ).bind(s, sid),
     );
   }
   if (stmts.length === 0) return json({ error: "Nothing to seed" }, 400);
@@ -142,7 +181,10 @@ export async function handleIntakeSubmit(
   const origin = new URL(request.url).origin;
   return json({
     ok: true,
-    seeded: { identity_fields: stmts.length - seeds.length * 2, memories: seeds.length },
+    seeded: {
+      identity_fields: stmts.length - seeds.length * 2,
+      memories: seeds.length,
+    },
     mcp_url: `${origin}/mcp/${encodeTokenSegment(env.DEMO_TOKEN)}`,
     next: "Paste the MCP URL into Claude (Settings → Connectors) or any MCP client. Your AI reads get_identity first.",
   });

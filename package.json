@@ -7,7 +7,14 @@
     "dev": "wrangler dev",
     "deploy": "wrangler d1 migrations apply DB --remote && node scripts/after-install.mjs",
     "tail": "wrangler tail",
-    "test": "bun test"
+    "gate:install": "npm ci --prefix gate",
+    "format": "gate/node_modules/.bin/prettier --write .",
+    "format:check": "gate/node_modules/.bin/prettier --check .",
+    "lint": "gate/node_modules/.bin/eslint --config gate/eslint.config.mjs --max-warnings 0 .",
+    "typecheck": "gate/node_modules/.bin/tsc --noEmit -p gate/tsconfig.json && gate/node_modules/.bin/tsc --noEmit -p gate/tsconfig.test.json",
+    "test": "gate/node_modules/.bin/vitest run --config gate/vitest.config.mts",
+    "coverage": "gate/node_modules/.bin/vitest run --config gate/vitest.config.mts --coverage && node gate/verify-coverage-scope.mjs",
+    "local:gate": "npm run format:check && npm run lint && npm run typecheck && npm run coverage"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260501.0",

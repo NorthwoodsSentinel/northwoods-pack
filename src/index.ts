@@ -17,13 +17,7 @@
  * stays available as the "enterprise tier" for orgs that want per-Worker isolation.
  */
 
-import {
-  corsHeaders,
-  json,
-  unauthorized,
-  notFound,
-  Env,
-} from "./common";
+import { corsHeaders, json, unauthorized, notFound, Env } from "./common";
 import { handleTransform } from "./rhetoric";
 import {
   handleRemember,
@@ -37,7 +31,12 @@ import { handleAsk, handleOpen } from "./mycelia";
 import { handleIdentityGet, handleIdentityPut } from "./identity";
 import { handleIntakeForm, handleIntakeSubmit } from "./intake";
 import { handleMcp } from "./mcp";
-import { ensureSchema, tokenIsDefault, tokenMatches, TOKEN_HELP } from "./setup";
+import {
+  ensureSchema,
+  tokenIsDefault,
+  tokenMatches,
+  TOKEN_HELP,
+} from "./setup";
 import { handleChatPage, handleChatSend } from "./chat";
 import { handleConnectPage } from "./connect";
 
@@ -91,8 +90,11 @@ async function info(env: Env): Promise<Response> {
       identity: { paths: ["GET /identity", "PUT /identity"] },
       intake: { paths: ["GET /intake (the interview)", "POST /intake"] },
       mcp: {
-        paths: ["POST /mcp/:token. MCP server (get_identity, recall_memories, remember, correct_me)"],
-        felt_win: "paste your MCP URL into Claude or any MCP client; your AI knows you",
+        paths: [
+          "POST /mcp/:token. MCP server (get_identity, recall_memories, remember, correct_me)",
+        ],
+        felt_win:
+          "paste your MCP URL into Claude or any MCP client; your AI knows you",
       },
     },
     doctrine: {
@@ -116,16 +118,21 @@ export default {
     // The human front door: routes by state. Machines get JSON at /api.
     if (method === "GET" && (path === "/" || path === "")) {
       if (tokenIsDefault(env)) {
-        return new Response(landing(
-          "One step left before this is yours",
-          "The pack ships locked with a factory token, otherwise every install would share one public key. In your Cloudflare dashboard open this Worker → <b>Settings → Variables and Secrets</b>, replace <code>DEMO_TOKEN</code> with a long random string of your own, and reload this page.",
-          ""), { headers: { "Content-Type": "text/html; charset=utf-8" } });
+        return new Response(
+          landing(
+            "One step left before this is yours",
+            "The pack ships locked with a factory token, otherwise every install would share one public key. In your Cloudflare dashboard open this Worker → <b>Settings → Variables and Secrets</b>, replace <code>DEMO_TOKEN</code> with a long random string of your own, and reload this page.",
+            "",
+          ),
+          { headers: { "Content-Type": "text/html; charset=utf-8" } },
+        );
       }
       await ensureSchema(env);
-      return new Response(landing(
-        "Your harness is alive",
-        "It runs on your account, keeps everything in your database, and talks with its own built-in AI. Nothing here belongs to anyone but you.",
-        `<div class="doors">
+      return new Response(
+        landing(
+          "Your harness is alive",
+          "It runs on your account, keeps everything in your database, and talks with its own built-in AI. Nothing here belongs to anyone but you.",
+          `<div class="doors">
            <div class="door"><h2>I'm new, no AI setup, no terminal</h2>
              <p>Then just talk. The first conversation is the introduction: it asks, you answer, nothing to fill out, nothing else to install.</p>
              <p><a href="/chat"><button>Talk to it</button></a></p></div>
@@ -136,8 +143,10 @@ export default {
          <p class="promise">A promise, for the person who almost closed this tab: you will not need a terminal, an install, or anyone's permission. One button got you here; from here you just talk. If you get stuck anywhere, that is my failure, not yours.</p>
          <p class="alt">Prefer forms? The <a href="/intake">five-question intake</a> still exists.
          Lost your token? You own this, set a new one in your Cloudflare dashboard (Worker → Settings → Variables and Secrets); your memories stay.
-         And everything here is yours to take: <code>/export</code> hands you the whole pot as one file.</p>`),
-        { headers: { "Content-Type": "text/html; charset=utf-8" } });
+         And everything here is yours to take: <code>/export</code> hands you the whole pot as one file.</p>`,
+        ),
+        { headers: { "Content-Type": "text/html; charset=utf-8" } },
+      );
     }
     if (method === "GET" && path === "/api") {
       return info(env);
@@ -146,18 +155,34 @@ export default {
     // can't leave isn't sovereignty. (Council catch, 2026-08-20.)
     if (method === "GET" && path === "/export") {
       if (tokenIsDefault(env)) return json({ error: TOKEN_HELP }, 503);
-      const t = url.searchParams.get("token") || request.headers.get("X-Pack-Token") || "";
+      const t =
+        url.searchParams.get("token") ||
+        request.headers.get("X-Pack-Token") ||
+        "";
       if (!(await tokenMatches(env, t))) return unauthorized();
       await ensureSchema(env);
-      const idn = await env.DB.prepare("SELECT key, value, source, updated_at FROM identity_fields").all();
-      const mem = await env.DB.prepare("SELECT * FROM substrate_entries ORDER BY created_at").all();
-      const lps = await env.DB.prepare("SELECT * FROM loops ORDER BY created_at").all();
+      const idn = await env.DB.prepare(
+        "SELECT key, value, source, updated_at FROM identity_fields",
+      ).all();
+      const mem = await env.DB.prepare(
+        "SELECT * FROM substrate_entries ORDER BY created_at",
+      ).all();
+      const lps = await env.DB.prepare(
+        "SELECT * FROM loops ORDER BY created_at",
+      ).all();
       const lines: string[] = [];
-      for (const r of idn.results ?? []) lines.push(JSON.stringify({ record: "identity", ...r }));
-      for (const r of mem.results ?? []) lines.push(JSON.stringify({ record: "memory", ...r }));
-      for (const r of lps.results ?? []) lines.push(JSON.stringify({ record: "loop", ...r }));
+      for (const r of idn.results ?? [])
+        lines.push(JSON.stringify({ record: "identity", ...r }));
+      for (const r of mem.results ?? [])
+        lines.push(JSON.stringify({ record: "memory", ...r }));
+      for (const r of lps.results ?? [])
+        lines.push(JSON.stringify({ record: "loop", ...r }));
       return new Response(lines.join("\n") + "\n", {
-        headers: { "Content-Type": "application/x-ndjson", "Content-Disposition": 'attachment; filename="my-harness-export.jsonl"' },
+        headers: {
+          "Content-Type": "application/x-ndjson",
+          "Content-Disposition":
+            'attachment; filename="my-harness-export.jsonl"',
+        },
       });
     }
     if (method === "GET" && path === "/connect") {
@@ -218,7 +243,7 @@ export default {
       }
       // --- rhetoric ---
       if (method === "POST" && path === "/rhetoric/transform") {
-        return await handleTransform(request, env);
+        return await handleTransform(request);
       }
       // --- substrate ---
       if (method === "POST" && path === "/substrate/remember") {
@@ -240,10 +265,10 @@ export default {
       }
       // --- mycelia ---
       if (method === "POST" && path === "/mycelia/ask") {
-        return await handleAsk(request, env);
+        return await handleAsk(request);
       }
       if (method === "GET" && path === "/mycelia/open") {
-        return await handleOpen(request, env);
+        return await handleOpen(request);
       }
     } catch (err) {
       return json({ error: "Internal error", detail: String(err) }, 500);

@@ -1,8 +1,8 @@
-import { describe, expect, test } from "bun:test";
 import { DEFAULT_TOKEN, tokenIsDefault, tokenMatches } from "../src/setup";
 import type { Env } from "../src/common";
 
-const env = (DEMO_TOKEN: string | undefined) => ({ DEMO_TOKEN } as unknown as Env);
+const env = (DEMO_TOKEN: string | undefined) =>
+  ({ DEMO_TOKEN }) as unknown as Env;
 const REAL = "9f2c1e7a4b8d0c3f6e5a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f6a";
 
 describe("tokenMatches", () => {
@@ -18,7 +18,13 @@ describe("tokenMatches", () => {
   });
 
   test("rejects missing or non-string input", async () => {
-    for (const p of [undefined, null, "", 0 as unknown as string, {} as unknown as string]) {
+    for (const p of [
+      undefined,
+      null,
+      "",
+      0 as unknown as string,
+      {} as unknown as string,
+    ]) {
       expect(await tokenMatches(env(REAL), p)).toBe(false);
     }
   });

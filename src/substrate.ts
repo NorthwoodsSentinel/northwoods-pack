@@ -112,7 +112,8 @@ export async function handleRecall(
     }
   }
 
-  const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const where =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
   const sql = `SELECT id, type, body, tags_json, created_at, updated_at
                FROM substrate_entries
                ${where}
@@ -120,7 +121,9 @@ export async function handleRecall(
                LIMIT ?`;
   params.push(limit);
 
-  const result = await env.DB.prepare(sql).bind(...params).all();
+  const result = await env.DB.prepare(sql)
+    .bind(...params)
+    .all();
   const entries = (result.results ?? []).map(rowToEntry);
   return json({ entries, count: entries.length });
 }
@@ -145,7 +148,8 @@ export async function handleList(url: URL, env: Env): Promise<Response> {
     params.push(`%"${tag}"%`);
   }
 
-  const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const where =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
   const sql = `SELECT id, type, body, tags_json, created_at, updated_at
                FROM substrate_entries
                ${where}
@@ -153,7 +157,9 @@ export async function handleList(url: URL, env: Env): Promise<Response> {
                LIMIT ?`;
   params.push(limit);
 
-  const result = await env.DB.prepare(sql).bind(...params).all();
+  const result = await env.DB.prepare(sql)
+    .bind(...params)
+    .all();
   const entries = (result.results ?? []).map(rowToEntry);
   return json({ entries, count: entries.length });
 }

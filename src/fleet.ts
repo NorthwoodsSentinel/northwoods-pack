@@ -68,10 +68,13 @@ export async function handleRoute(
   const maxTokens = Math.min(Math.max(64, body.max_tokens ?? 512), 2048);
 
   try {
-    const result = (await env.AI.run(decision.model as keyof AiModels, {
-      messages: [{ role: "user", content: body.task }],
-      max_tokens: maxTokens,
-    } as never)) as { response?: string };
+    const result = (await env.AI.run(
+      decision.model as keyof AiModels,
+      {
+        messages: [{ role: "user", content: body.task }],
+        max_tokens: maxTokens,
+      } as never,
+    )) as { response?: string };
 
     return json({
       response: result?.response ?? "",
